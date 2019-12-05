@@ -1,0 +1,20 @@
+{
+  "name": "typed-firestore",
+  "version": "0.0.0",
+  "description": "firestore jss client app with stronger type",
+  "main": "distribution/index.js",
+  "types": "distribution/index.d.ts",
+  "author": "narumincho <narumincho.starfy@gmail.com> (https://narumincho.com)",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/narumincho/typed-firestore.git"
+  },
+  "dependencies": {
+    "@firebase/app-types": "^0.4.8",
+    "@firebase/firestore-types": "^1.8.0"
+  },
+  "devDependencies": {
+    "typescript": "^3.7.3"
+  }
+}
