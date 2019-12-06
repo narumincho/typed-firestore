@@ -20,6 +20,42 @@
 import { FirebaseApp, FirebaseNamespace } from "@firebase/app-types";
 import * as firestore from "@firebase/firestore-types";
 
+type ValueOf<T> = T[keyof T];
+
+type ObjectKeyToArray<obj extends DocumentData> =
+  | keyof obj
+  | ValueOf<
+      {
+        [k in keyof obj]: obj[k] extends DocumentData
+          ? [k, ObjectKeyToArray<obj[k]>]
+          : k;
+      }
+    >;
+
+type Append<Elm, T extends unknown[]> = ((
+  arg: Elm,
+  ...rest: T
+) => void) extends (...args: infer T2) => void
+  ? T2
+  : never;
+
+export type R = ObjectKeyToArray<{
+  user: {
+    name: string;
+    id: string;
+    age: number;
+    account: { id: string; service: string };
+  };
+  project: { name: string; createdAt: number };
+}>;
+/*
+
+{sampleId: {name: string, id: string, age: number}};
+→
+["sampleId"] | ["sample", "name"] | ["sample", "id"]
+
+*/
+
 export type DocumentData = {
   [field in string]: firestorePrimitiveType | Array<firestorePrimitiveType>;
 };
@@ -291,7 +327,7 @@ export class DocumentSnapshot<doc extends DocumentData> {
   readonly id: string;
   readonly metadata: SnapshotMetadata;
 
-  data(options?: SnapshotOptions): DocumentData | undefined;
+  data(options?: SnapshotOptions): doc | undefined;
 
   get(fieldPath: string | FieldPath, options?: SnapshotOptions): any;
 
@@ -302,10 +338,8 @@ export class QueryDocumentSnapshot<
   doc extends DocumentData
 > extends DocumentSnapshot<doc> {
   private constructor();
-  data(options?: SnapshotOptions): DocumentData;
+  data(options?: SnapshotOptions): doc;
 }
-
-export type OrderByDirection = "desc" | "asc";
 
 export type WhereFilterOp =
   | "<"
@@ -330,7 +364,7 @@ export class Query<doc extends DocumentData> {
 
   orderBy(
     fieldPath: string | FieldPath,
-    directionStr?: OrderByDirection
+    directionStr?: firestore.OrderByDirection
   ): Query<doc>;
 
   limit(limit: number): Query<doc>;
