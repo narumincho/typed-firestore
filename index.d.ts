@@ -27,10 +27,12 @@ type ObjectKeyToArray<obj extends DocumentData> =
   | ValueOf<
       {
         [k in keyof obj]: obj[k] extends DocumentData
-          ? [k, ObjectKeyToArray<obj[k]>]
+          ? OA<k, ObjectKeyToArray<obj[k]>>
           : k;
       }
     >;
+
+type OA<k, o> = o extends Array<unknown> ? Append<k, o> : [k, o];
 
 type Append<Elm, T extends unknown[]> = ((
   arg: Elm,
@@ -69,9 +71,9 @@ export type DocumentAndSubCollectionData = {
   col: CollectionData;
 };
 
-/** TODO バイト型が不明! */
 type firestorePrimitiveType =
   | boolean
+  | firestore.Blob
   | firestore.Timestamp
   | number
   | firestore.GeoPoint
