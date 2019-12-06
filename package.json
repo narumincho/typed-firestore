@@ -1,7 +1,7 @@
 {
   "name": "typed-firestore",
   "version": "0.0.0",
-  "description": "firestore jss client app with stronger type",
+  "description": "stronger type for @firebase/firestore-types",
   "main": "distribution/index.js",
   "types": "distribution/index.d.ts",
   "author": "narumincho <narumincho.starfy@gmail.com> (https://narumincho.com)",
