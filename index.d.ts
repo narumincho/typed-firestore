@@ -198,10 +198,6 @@ type WriteBatch = {
   commit(): Promise<void>;
 };
 
-export interface SnapshotListenOptions {
-  readonly includeMetadataChanges?: boolean;
-}
-
 export class TypedDocumentReference<
   docAndSub extends DocumentAndSubCollectionData
 > {
@@ -235,11 +231,11 @@ export class TypedDocumentReference<
 
   onSnapshot(observer: {
     next?: (snapshot: DocumentSnapshot<docAndSub["doc"]>) => void;
-    error?: (error: FirestoreError) => void;
+    error?: (error: firestore.FirestoreError) => void;
     complete?: () => void;
   }): () => void;
   onSnapshot(
-    options: SnapshotListenOptions,
+    options: firestore.SnapshotListenOptions,
     observer: {
       next?: (snapshot: DocumentSnapshot<docAndSub["doc"]>) => void;
       error?: (error: Error) => void;
@@ -252,15 +248,11 @@ export class TypedDocumentReference<
     onCompletion?: () => void
   ): () => void;
   onSnapshot(
-    options: SnapshotListenOptions,
+    options: firestore.SnapshotListenOptions,
     onNext: (snapshot: DocumentSnapshot<docAndSub["doc"]>) => void,
     onError?: (error: Error) => void,
     onCompletion?: () => void
   ): () => void;
-}
-
-export interface SnapshotOptions {
-  readonly serverTimestamps?: "estimate" | "previous" | "none";
 }
 
 /** Metadata about a snapshot, describing the state of the snapshot. */
@@ -279,9 +271,9 @@ export class DocumentSnapshot<doc extends DocumentData> {
   readonly id: string;
   readonly metadata: SnapshotMetadata;
 
-  data(options?: SnapshotOptions): doc | undefined;
+  data(options?: firestore.SnapshotOptions): doc | undefined;
 
-  get(fieldPath: string | FieldPath, options?: SnapshotOptions): any;
+  get(fieldPath: string | FieldPath, options?: firestore.SnapshotOptions): any;
 
   isEqual(other: DocumentSnapshot<doc>): boolean;
 }
@@ -290,7 +282,7 @@ export class QueryDocumentSnapshot<
   doc extends DocumentData
 > extends DocumentSnapshot<doc> {
   private constructor();
-  data(options?: SnapshotOptions): doc;
+  data(options?: firestore.SnapshotOptions): doc;
 }
 
 export class Query<doc extends DocumentData> {
@@ -335,7 +327,7 @@ export class Query<doc extends DocumentData> {
     complete?: () => void;
   }): () => void;
   onSnapshot(
-    options: SnapshotListenOptions,
+    options: firestore.SnapshotListenOptions,
     observer: {
       next?: (snapshot: QuerySnapshot<doc>) => void;
       error?: (error: Error) => void;
@@ -348,7 +340,7 @@ export class Query<doc extends DocumentData> {
     onCompletion?: () => void
   ): () => void;
   onSnapshot(
-    options: SnapshotListenOptions,
+    options: firestore.SnapshotListenOptions,
     onNext: (snapshot: QuerySnapshot<doc>) => void,
     onError?: (error: Error) => void,
     onCompletion?: () => void
@@ -364,7 +356,7 @@ export class QuerySnapshot<doc extends DocumentData> {
   readonly size: number;
   readonly empty: boolean;
 
-  docChanges(options?: SnapshotListenOptions): DocumentChange[];
+  docChanges(options?: firestore.SnapshotListenOptions): DocumentChange[];
 
   forEach(
     callback: (result: QueryDocumentSnapshot<doc>) => void,
@@ -419,11 +411,4 @@ export class FieldPath {
   static documentId(): FieldPath;
 
   isEqual(other: FieldPath): boolean;
-}
-
-export interface FirestoreError {
-  code: firestore.FirestoreErrorCode;
-  message: string;
-  name: string;
-  stack?: string;
 }
