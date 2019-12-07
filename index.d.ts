@@ -121,9 +121,7 @@ type TypedFirebaseFirestore<col extends CollectionData> = {
   collectionGroup(collectionId: string): Query<any>;
 
   runTransaction<T>(
-    updateFunction: (
-      transaction: Transaction<{ doc: {}; col: col }>
-    ) => Promise<T>
+    updateFunction: (transaction: Transaction) => Promise<T>
   ): Promise<T>;
 
   batch(): WriteBatch<any>;
@@ -150,31 +148,33 @@ type TypedFirebaseFirestore<col extends CollectionData> = {
   INTERNAL: { delete: () => Promise<void> };
 };
 
-  get(
+export type Transaction = {
+  get<docAndSub extends DocumentAndSubCollectionData>(
     documentRef: TypedDocumentReference<docAndSub>
   ): Promise<DocumentSnapshot<docAndSub["doc"]>>;
 
-  set(
+  set<docAndSub extends DocumentAndSubCollectionData>(
     documentRef: TypedDocumentReference<docAndSub>,
     data: DocumentData,
-    options?: SetOptions
-  ): Transaction<docAndSub>;
+    options?: firestore.SetOptions
+  ): Transaction;
 
-  update(
+  update<docAndSub extends DocumentAndSubCollectionData>(
     documentRef: TypedDocumentReference<docAndSub>,
     data: UpdateData
-  ): Transaction<docAndSub>;
-  update(
+  ): Transaction;
+
+  update<docAndSub extends DocumentAndSubCollectionData>(
     documentRef: TypedDocumentReference<docAndSub>,
     field: string | FieldPath,
     value: any,
     ...moreFieldsAndValues: any[]
-  ): Transaction<docAndSub>;
+  ): Transaction;
 
-  delete(
+  delete<docAndSub extends DocumentAndSubCollectionData>(
     documentRef: TypedDocumentReference<docAndSub>
-  ): Transaction<docAndSub>;
-}
+  ): Transaction;
+};
 
 export class WriteBatch<docAndSub extends DocumentAndSubCollectionData> {
   private constructor();
@@ -182,7 +182,7 @@ export class WriteBatch<docAndSub extends DocumentAndSubCollectionData> {
   set(
     documentRef: TypedDocumentReference<docAndSub>,
     data: DocumentData,
-    options?: SetOptions
+    options?: firestore.SetOptions
   ): WriteBatch<docAndSub>;
 
   update(
@@ -205,15 +205,6 @@ export interface SnapshotListenOptions {
   readonly includeMetadataChanges?: boolean;
 }
 
-export interface SetOptions {
-  readonly merge?: boolean;
-  readonly mergeFields?: (string | FieldPath)[];
-}
-
-export interface GetOptions {
-  readonly source?: "default" | "server" | "cache";
-}
-
 export class TypedDocumentReference<
   docAndSub extends DocumentAndSubCollectionData
 > {
@@ -230,7 +221,7 @@ export class TypedDocumentReference<
 
   isEqual(other: TypedDocumentReference<docAndSub>): boolean;
 
-  set(data: DocumentData, options?: SetOptions): Promise<void>;
+  set(data: DocumentData, options?: firestore.SetOptions): Promise<void>;
 
   update(data: UpdateData): Promise<void>;
   update(
@@ -241,7 +232,9 @@ export class TypedDocumentReference<
 
   delete(): Promise<void>;
 
-  get(options?: GetOptions): Promise<DocumentSnapshot<docAndSub["doc"]>>;
+  get(
+    options?: firestore.GetOptions
+  ): Promise<DocumentSnapshot<docAndSub["doc"]>>;
 
   onSnapshot(observer: {
     next?: (snapshot: DocumentSnapshot<docAndSub["doc"]>) => void;
@@ -303,16 +296,6 @@ export class QueryDocumentSnapshot<
   data(options?: SnapshotOptions): doc;
 }
 
-export type WhereFilterOp =
-  | "<"
-  | "<="
-  | "=="
-  | ">="
-  | ">"
-  | "array-contains"
-  | "in"
-  | "array-contains-any";
-
 export class Query<doc extends DocumentData> {
   protected constructor();
 
@@ -320,7 +303,7 @@ export class Query<doc extends DocumentData> {
 
   where(
     fieldPath: string | FieldPath,
-    opStr: WhereFilterOp,
+    opStr: firestore.WhereFilterOp,
     value: any
   ): Query<doc>;
 
@@ -347,7 +330,7 @@ export class Query<doc extends DocumentData> {
 
   isEqual(other: Query<doc>): boolean;
 
-  get(options?: GetOptions): Promise<QuerySnapshot<doc>>;
+  get(options?: firestore.GetOptions): Promise<QuerySnapshot<doc>>;
 
   onSnapshot(observer: {
     next?: (snapshot: QuerySnapshot<doc>) => void;
