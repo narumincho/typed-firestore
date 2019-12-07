@@ -24,27 +24,41 @@ type ValueOf<T> = T[keyof T];
 
 type ObjectToFiledPath<T extends DocumentData> = ValueOf<
   {
-    [k0 in keyof T]: T[k0] extends DocumentData
-      ? ValueOf<
-          {
-            [k1 in keyof T[k0]]: T[k0][k1] extends DocumentData
-              ? ValueOf<
-                  {
-                    [k2 in keyof T[k0][k1]]: T[k0][k1][k2] extends DocumentData
+    [k0 in keyof T]:
+      | [k0]
+      | (T[k0] extends DocumentData
+          ? ValueOf<
+              {
+                [k1 in keyof T[k0]]:
+                  | [k0, k1]
+                  | (T[k0][k1] extends DocumentData
                       ? ValueOf<
                           {
-                            [k3 in keyof T[k0][k1][k2]]: T[k0][k1][k2][k3] extends DocumentData
-                              ? [k0, k1, k2, k3, keyof T[k0][k1][k2][k3]]
-                              : [k0, k1, k2, k3];
+                            [k2 in keyof T[k0][k1]]:
+                              | [k0, k1, k2]
+                              | (T[k0][k1][k2] extends DocumentData
+                                  ? ValueOf<
+                                      {
+                                        [k3 in keyof T[k0][k1][k2]]:
+                                          | [k0, k1, k2, k3]
+                                          | (T[k0][k1][k2][k3] extends DocumentData
+                                              ? [
+                                                  k0,
+                                                  k1,
+                                                  k2,
+                                                  k3,
+                                                  keyof T[k0][k1][k2][k3]
+                                                ]
+                                              : never);
+                                      }
+                                    >
+                                  : never);
                           }
                         >
-                      : [k0, k1, k2];
-                  }
-                >
-              : [k0, k1];
-          }
-        >
-      : [k0];
+                      : never);
+              }
+            >
+          : never);
   }
 >;
 
@@ -62,9 +76,11 @@ export type R = ObjectToFiledPath<{
   project: { name: string; createdAt: number };
 }>;
 
+type Sample = ObjectToFiledPath<{
+  sampleId: { name: string; id: string; age: number };
+}>;
 /*
 
-{sampleId: {name: string, id: string, age: number}};
 →
 ["sampleId"] | ["sample", "name"] | ["sample", "id"]
 
