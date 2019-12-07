@@ -22,34 +22,46 @@ import * as firestore from "@firebase/firestore-types";
 
 type ValueOf<T> = T[keyof T];
 
-type ObjectKeyToArray<obj extends DocumentData> =
-  | keyof obj
-  | ValueOf<
-      {
-        [k in keyof obj]: obj[k] extends DocumentData
-          ? OA<k, ObjectKeyToArray<obj[k]>>
-          : k;
-      }
-    >;
+type ObjectToFiledPath<T extends DocumentData> = ValueOf<
+  {
+    [k0 in keyof T]: T[k0] extends DocumentData
+      ? ValueOf<
+          {
+            [k1 in keyof T[k0]]: T[k0][k1] extends DocumentData
+              ? ValueOf<
+                  {
+                    [k2 in keyof T[k0][k1]]: T[k0][k1][k2] extends DocumentData
+                      ? ValueOf<
+                          {
+                            [k3 in keyof T[k0][k1][k2]]: T[k0][k1][k2][k3] extends DocumentData
+                              ? [k0, k1, k2, k3, keyof T[k0][k1][k2][k3]]
+                              : [k0, k1, k2, k3];
+                          }
+                        >
+                      : [k0, k1, k2];
+                  }
+                >
+              : [k0, k1];
+          }
+        >
+      : [k0];
+  }
+>;
 
-type OA<k, o> = o extends Array<unknown> ? Append<k, o> : [k, o];
-
-type Append<Elm, T extends unknown[]> = ((
-  arg: Elm,
-  ...rest: T
-) => void) extends (...args: infer T2) => void
-  ? T2
-  : never;
-
-export type R = ObjectKeyToArray<{
+export type R = ObjectToFiledPath<{
   user: {
     name: string;
     id: string;
     age: number;
-    account: { id: string; service: string };
+    account: {
+      id: string;
+      service: string;
+      nest: { nestNest: { nestNestNest: { superNest: number } } };
+    };
   };
   project: { name: string; createdAt: number };
 }>;
+
 /*
 
 {sampleId: {name: string, id: string, age: number}};

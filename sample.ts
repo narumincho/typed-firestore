@@ -16,5 +16,5 @@ const firestoreIns = {} as f.TypedFirebaseFirestore<{
     return;
   }
   userData.age;
-  const r: f.R = ["user", "account", ""];
+  const r: f.R = ["user", "account", "service"];
 })();
