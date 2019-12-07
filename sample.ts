@@ -6,15 +6,11 @@ const firestoreIns = {} as f.TypedFirebaseFirestore<{
 }>;
 
 (async () => {
-  const userData = (
-    await firestoreIns
-      .collection("user")
-      .doc("faw")
-      .get()
-  ).data();
+  const docRef = firestoreIns.collection("user").doc("faw");
+  const userData = (await docRef.get()).data();
   if (userData === undefined) {
     return;
   }
   userData.age;
-  const r: f.R = ["user", "account", "service"];
+  firestoreIns.runTransaction(tra => tra.delete(docRef).get(docRef));
 })();

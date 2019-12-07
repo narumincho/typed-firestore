@@ -155,7 +155,7 @@ export type Transaction = {
 
   set<docAndSub extends DocumentAndSubCollectionData>(
     documentRef: TypedDocumentReference<docAndSub>,
-    data: DocumentData,
+    data: docAndSub["doc"],
     options?: firestore.SetOptions
   ): Transaction;
 
@@ -171,21 +171,19 @@ export type Transaction = {
     ...moreFieldsAndValues: any[]
   ): Transaction;
 
-  delete<docAndSub extends DocumentAndSubCollectionData>(
-    documentRef: TypedDocumentReference<docAndSub>
-  ): Transaction;
+  delete(documentRef: firestore.DocumentReference): Transaction;
 };
 
 type WriteBatch = {
   set<docAndSub extends DocumentAndSubCollectionData>(
     documentRef: TypedDocumentReference<docAndSub>,
-    data: DocumentData,
+    data: docAndSub["doc"],
     options?: firestore.SetOptions
   ): WriteBatch;
 
   update<docAndSub extends DocumentAndSubCollectionData>(
     documentRef: TypedDocumentReference<docAndSub>,
-    data: UpdateData
+    data: docAndSub["doc"]
   ): WriteBatch;
 
   update<docAndSub extends DocumentAndSubCollectionData>(
@@ -195,9 +193,7 @@ type WriteBatch = {
     ...moreFieldsAndValues: any[]
   ): WriteBatch;
 
-  delete<docAndSub extends DocumentAndSubCollectionData>(
-    documentRef: TypedDocumentReference<docAndSub>
-  ): WriteBatch;
+  delete(documentRef: firestore.DocumentReference): WriteBatch;
 
   commit(): Promise<void>;
 };
