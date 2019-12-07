@@ -62,7 +62,7 @@ type ObjectToFiledPath<T extends DocumentData> = ValueOf<
   }
 >;
 
-export type R = ObjectToFiledPath<{
+type R = ObjectToFiledPath<{
   user: {
     name: string;
     id: string;
@@ -75,16 +75,6 @@ export type R = ObjectToFiledPath<{
   };
   project: { name: string; createdAt: number };
 }>;
-
-type Sample = ObjectToFiledPath<{
-  sampleId: { name: string; id: string; age: number };
-}>;
-/*
-
-→
-["sampleId"] | ["sample", "name"] | ["sample", "id"]
-
-*/
 
 export type DocumentData = {
   [field in string]: firestorePrimitiveType | Array<firestorePrimitiveType>;
@@ -115,25 +105,10 @@ type firestorePrimitiveType =
 
 export type UpdateData = { [fieldPath in string]: any };
 
-export interface Settings {
-  host?: string;
-  ssl?: boolean;
-  timestampsInSnapshots?: boolean;
-  cacheSizeBytes?: number;
-  experimentalForceLongPolling?: boolean;
-}
+type TypedFirebaseFirestore<col extends CollectionData> = {
+  settings(settings: firestore.Settings): void;
 
-export interface PersistenceSettings {
-  synchronizeTabs?: boolean;
-  experimentalTabSynchronization?: boolean;
-}
-
-export class TypedFirebaseFirestore<col extends CollectionData> {
-  private constructor();
-
-  settings(settings: Settings): void;
-
-  enablePersistence(settings?: PersistenceSettings): Promise<void>;
+  enablePersistence(settings?: firestore.PersistenceSettings): Promise<void>;
 
   collection: <collectionPath extends keyof col>(
     collectionPath: collectionPath
@@ -173,52 +148,7 @@ export class TypedFirebaseFirestore<col extends CollectionData> {
   terminate(): Promise<void>;
 
   INTERNAL: { delete: () => Promise<void> };
-}
-
-export class GeoPoint {
-  constructor(latitude: number, longitude: number);
-
-  readonly latitude: number;
-  readonly longitude: number;
-
-  isEqual(other: GeoPoint): boolean;
-}
-
-export class Timestamp {
-  constructor(seconds: number, nanoseconds: number);
-
-  static now(): Timestamp;
-
-  static fromDate(date: Date): Timestamp;
-
-  static fromMillis(milliseconds: number): Timestamp;
-
-  readonly seconds: number;
-  readonly nanoseconds: number;
-
-  toDate(): Date;
-
-  toMillis(): number;
-
-  isEqual(other: Timestamp): boolean;
-}
-
-export class Blob {
-  private constructor();
-
-  static fromBase64String(base64: string): Blob;
-
-  static fromUint8Array(array: Uint8Array): Blob;
-
-  public toBase64(): string;
-
-  public toUint8Array(): Uint8Array;
-
-  isEqual(other: Blob): boolean;
-}
-
-export class Transaction<docAndSub extends DocumentAndSubCollectionData> {
-  private constructor();
+};
 
   get(
     documentRef: TypedDocumentReference<docAndSub>
