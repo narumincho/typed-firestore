@@ -124,7 +124,7 @@ type TypedFirebaseFirestore<col extends CollectionData> = {
     updateFunction: (transaction: Transaction) => Promise<T>
   ): Promise<T>;
 
-  batch(): WriteBatch<any>;
+  batch(): WriteBatch;
 
   app: any;
 
@@ -176,30 +176,31 @@ export type Transaction = {
   ): Transaction;
 };
 
-export class WriteBatch<docAndSub extends DocumentAndSubCollectionData> {
-  private constructor();
-
-  set(
+type WriteBatch = {
+  set<docAndSub extends DocumentAndSubCollectionData>(
     documentRef: TypedDocumentReference<docAndSub>,
     data: DocumentData,
     options?: firestore.SetOptions
-  ): WriteBatch<docAndSub>;
+  ): WriteBatch;
 
-  update(
+  update<docAndSub extends DocumentAndSubCollectionData>(
     documentRef: TypedDocumentReference<docAndSub>,
     data: UpdateData
-  ): WriteBatch<docAndSub>;
-  update(
+  ): WriteBatch;
+
+  update<docAndSub extends DocumentAndSubCollectionData>(
     documentRef: TypedDocumentReference<docAndSub>,
     field: string | FieldPath,
     value: any,
     ...moreFieldsAndValues: any[]
-  ): WriteBatch<docAndSub>;
+  ): WriteBatch;
 
-  delete(documentRef: TypedDocumentReference<docAndSub>): WriteBatch<docAndSub>;
+  delete<docAndSub extends DocumentAndSubCollectionData>(
+    documentRef: TypedDocumentReference<docAndSub>
+  ): WriteBatch;
 
   commit(): Promise<void>;
-}
+};
 
 export interface SnapshotListenOptions {
   readonly includeMetadataChanges?: boolean;
