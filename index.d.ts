@@ -105,7 +105,9 @@ type firestorePrimitiveType =
   | firestore.Timestamp
   | number
   | firestore.GeoPoint
-  | { [field in string]: firestorePrimitiveType }
+  | {
+      [field in string]: firestorePrimitiveType | Array<firestorePrimitiveType>;
+    }
   | null
   | firestore.CollectionReference
   | firestore.DocumentReference
