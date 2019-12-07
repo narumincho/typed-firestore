@@ -389,20 +389,27 @@ export class TypedCollectionReference<
   isEqual(other: TypedCollectionReference<docAndSub>): boolean;
 }
 
-export class FieldValue {
+export type FieldValueValue =
+  | "serverTimestamp"
+  | "delete"
+  | "arrayUnion"
+  | "arrayRemove"
+  | "increment";
+
+export class FieldValue<value extends FieldValueValue> {
   private constructor();
 
-  static serverTimestamp(): FieldValue;
+  static serverTimestamp(): FieldValue<"serverTimestamp">;
 
-  static delete(): FieldValue;
+  static delete(): FieldValue<"delete">;
 
-  static arrayUnion(...elements: any[]): FieldValue;
+  static arrayUnion(...elements: any[]): FieldValue<"arrayUnion">;
 
-  static arrayRemove(...elements: any[]): FieldValue;
+  static arrayRemove(...elements: any[]): FieldValue<"arrayRemove">;
 
-  static increment(n: number): FieldValue;
+  static increment(n: number): FieldValue<"increment">;
 
-  isEqual(other: FieldValue): boolean;
+  isEqual(other: FieldValue<any>): boolean;
 }
 
 export class FieldPath {
