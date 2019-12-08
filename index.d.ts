@@ -270,11 +270,10 @@ export type DocumentSnapshot<doc extends DocumentData> = {
   readonly isEqual: (other: DocumentSnapshot<doc>) => boolean;
 };
 
-export type QueryDocumentSnapshot<doc extends DocumentData> = DocumentSnapshot<
-  doc
-> & {
-  data(options?: firestore.SnapshotOptions): doc;
-};
+interface QueryDocumentSnapshot<doc extends DocumentData>
+  extends DocumentSnapshot<doc> {
+  readonly data: (options?: firestore.SnapshotOptions) => doc;
+}
 
 export type Query<doc extends DocumentData> = {
   readonly firestore: TypedFirebaseFirestore<any>;
