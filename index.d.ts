@@ -17,7 +17,7 @@
  * limitations under the License.
  */
 
-import { FirebaseApp, FirebaseNamespace } from "@firebase/app-types";
+import * as firebaseApp from "@firebase/app-types";
 import * as firestore from "@firebase/firestore-types";
 
 type ValueOf<T> = T[keyof T];
@@ -43,6 +43,10 @@ export type DocumentAndSubCollectionData = {
   col: CollectionData;
 };
 
+type GetIncludeDocument<col extends CollectionData> = ValueOf<
+  { [key in keyof col]: col[key]["doc"] | GetIncludeDocument<col[key]["col"]> }
+>;
+
 type firestorePrimitiveType =
   | boolean
   | firestore.Blob
@@ -60,35 +64,37 @@ type firestorePrimitiveType =
 export type UpdateData = { [fieldPath in string]: any };
 
 type TypedFirebaseFirestore<col extends CollectionData> = {
-  settings(settings: firestore.Settings): void;
+  readonly settings: (settings: firestore.Settings) => void;
 
-  enablePersistence(settings?: firestore.PersistenceSettings): Promise<void>;
+  readonly enablePersistence: (
+    settings?: firestore.PersistenceSettings
+  ) => Promise<void>;
 
-  collection: <collectionPath extends keyof col>(
+  readonly collection: <collectionPath extends keyof col>(
     collectionPath: collectionPath
   ) => TypedCollectionReference<col[collectionPath]>;
 
-  doc: <documentPath extends keyof col>(
+  readonly doc: <documentPath extends keyof col>(
     documentPath: documentPath
   ) => TypedDocumentReference<col[documentPath]>;
 
-  collectionGroup(collectionId: string): Query<any>;
+  readonly collectionGroup: (collectionId: string) => Query<any>;
 
-  runTransaction<T>(
+  readonly runTransaction: <T>(
     updateFunction: (transaction: Transaction) => Promise<T>
-  ): Promise<T>;
+  ) => Promise<T>;
 
-  batch(): WriteBatch;
+  readonly batch: () => WriteBatch;
 
-  app: any;
+  readonly app: firebaseApp.FirebaseApp;
 
-  clearPersistence(): Promise<void>;
+  readonly clearPersistence: () => Promise<void>;
 
-  enableNetwork(): Promise<void>;
+  readonly enableNetwork: () => Promise<void>;
 
-  disableNetwork(): Promise<void>;
+  readonly disableNetwork: () => Promise<void>;
 
-  waitForPendingWrites(): Promise<void>;
+  readonly waitForPendingWrites: () => Promise<void>;
 
   onSnapshotsInSync(observer: {
     next?: (value: void) => void;
@@ -97,21 +103,19 @@ type TypedFirebaseFirestore<col extends CollectionData> = {
   }): () => void;
   onSnapshotsInSync(onSync: () => void): () => void;
 
-  terminate(): Promise<void>;
-
-  INTERNAL: { delete: () => Promise<void> };
+  readonly terminate: () => Promise<void>;
 };
 
 export type Transaction = {
-  get<docAndSub extends DocumentAndSubCollectionData>(
+  readonly get: <docAndSub extends DocumentAndSubCollectionData>(
     documentRef: TypedDocumentReference<docAndSub>
-  ): Promise<DocumentSnapshot<docAndSub["doc"]>>;
+  ) => Promise<DocumentSnapshot<docAndSub["doc"]>>;
 
-  set<docAndSub extends DocumentAndSubCollectionData>(
+  set: <docAndSub extends DocumentAndSubCollectionData>(
     documentRef: TypedDocumentReference<docAndSub>,
     data: docAndSub["doc"],
     options?: firestore.SetOptions
-  ): Transaction;
+  ) => Transaction;
 
   update<docAndSub extends DocumentAndSubCollectionData>(
     documentRef: TypedDocumentReference<docAndSub>,
@@ -135,15 +139,15 @@ export type Transaction = {
     ...moreFieldsAndValues: any[]
   ): Transaction;
 
-  delete(documentRef: firestore.DocumentReference): Transaction;
+  readonly delete: (documentRef: firestore.DocumentReference) => Transaction;
 };
 
 type WriteBatch = {
-  set<docAndSub extends DocumentAndSubCollectionData>(
+  set: <docAndSub extends DocumentAndSubCollectionData>(
     documentRef: TypedDocumentReference<docAndSub>,
     data: docAndSub["doc"],
     options?: firestore.SetOptions
-  ): WriteBatch;
+  ) => WriteBatch;
 
   update<docAndSub extends DocumentAndSubCollectionData>(
     documentRef: TypedDocumentReference<docAndSub>,
@@ -167,28 +171,29 @@ type WriteBatch = {
     ...moreFieldsAndValues: any[]
   ): WriteBatch;
 
-  delete(documentRef: firestore.DocumentReference): WriteBatch;
+  readonly delete: (documentRef: firestore.DocumentReference) => WriteBatch;
 
-  commit(): Promise<void>;
+  readonly commit: () => Promise<void>;
 };
 
-export class TypedDocumentReference<
+export type TypedDocumentReference<
   docAndSub extends DocumentAndSubCollectionData
-> {
-  private constructor();
-
+> = {
   readonly id: string;
   readonly firestore: TypedFirebaseFirestore<any>;
   readonly parent: TypedCollectionReference<docAndSub>;
   readonly path: string;
 
-  collection: <collectionPath extends keyof docAndSub["col"]>(
+  readonly collection: <collectionPath extends keyof docAndSub["col"]>(
     collectionPath: collectionPath
   ) => TypedCollectionReference<docAndSub["col"][collectionPath]>;
 
-  isEqual(other: TypedDocumentReference<docAndSub>): boolean;
+  readonly isEqual: (other: TypedDocumentReference<docAndSub>) => boolean;
 
-  set(data: DocumentData, options?: firestore.SetOptions): Promise<void>;
+  readonly set: (
+    data: DocumentData,
+    options?: firestore.SetOptions
+  ) => Promise<void>;
 
   update(data: UpdateData): Promise<void>;
 
@@ -197,23 +202,25 @@ export class TypedDocumentReference<
     value: docAndSub["doc"][path],
     ...moreFieldsAndValues: any[]
   ): Promise<void>;
+
   update(
     field: firestore.FieldPath,
     value: ObjectValueType<docAndSub["doc"]>,
     ...moreFieldsAndValues: any[]
   ): Promise<void>;
 
-  delete(): Promise<void>;
+  readonly delete: () => Promise<void>;
 
-  get(
+  readonly get: (
     options?: firestore.GetOptions
-  ): Promise<DocumentSnapshot<docAndSub["doc"]>>;
+  ) => Promise<DocumentSnapshot<docAndSub["doc"]>>;
 
   onSnapshot(observer: {
     next?: (snapshot: DocumentSnapshot<docAndSub["doc"]>) => void;
     error?: (error: firestore.FirestoreError) => void;
     complete?: () => void;
   }): () => void;
+
   onSnapshot(
     options: firestore.SnapshotListenOptions,
     observer: {
@@ -222,18 +229,20 @@ export class TypedDocumentReference<
       complete?: () => void;
     }
   ): () => void;
+
   onSnapshot(
     onNext: (snapshot: DocumentSnapshot<docAndSub["doc"]>) => void,
     onError?: (error: Error) => void,
     onCompletion?: () => void
   ): () => void;
+
   onSnapshot(
     options: firestore.SnapshotListenOptions,
     onNext: (snapshot: DocumentSnapshot<docAndSub["doc"]>) => void,
     onError?: (error: Error) => void,
     onCompletion?: () => void
   ): () => void;
-}
+};
 
 export type DocumentSnapshot<doc extends DocumentData> = {
   readonly exists: boolean;
@@ -241,7 +250,7 @@ export type DocumentSnapshot<doc extends DocumentData> = {
   readonly id: string;
   readonly metadata: firestore.SnapshotMetadata;
 
-  data(options?: firestore.SnapshotOptions): doc | undefined;
+  readonly data: (options?: firestore.SnapshotOptions) => doc | undefined;
 
   get<path extends keyof doc & string>(
     fieldPath: path,
@@ -252,7 +261,7 @@ export type DocumentSnapshot<doc extends DocumentData> = {
     options?: firestore.SnapshotOptions
   ): ObjectValueType<doc> | undefined;
 
-  isEqual(other: DocumentSnapshot<doc>): boolean;
+  readonly isEqual: (other: DocumentSnapshot<doc>) => boolean;
 };
 
 export type QueryDocumentSnapshot<doc extends DocumentData> = DocumentSnapshot<
@@ -269,6 +278,7 @@ export type Query<doc extends DocumentData> = {
     opStr: firestore.WhereFilterOp,
     value: doc[path]
   ): Query<doc>;
+
   where(
     fieldPath: firestore.FieldPath,
     opStr: firestore.WhereFilterOp,
@@ -279,14 +289,15 @@ export type Query<doc extends DocumentData> = {
     fieldPath: path,
     directionStr?: firestore.OrderByDirection
   ): Query<doc>;
+
   orderBy(
     fieldPath: firestore.FieldPath,
     directionStr?: firestore.OrderByDirection
   ): Query<doc>;
 
-  limit(limit: number): Query<doc>;
+  readonly limit: (limit: number) => Query<doc>;
 
-  limitToLast(limit: number): Query<doc>;
+  readonly limitToLast: (limit: number) => Query<doc>;
 
   startAt(snapshot: DocumentSnapshot<doc>): Query<doc>;
   startAt(...fieldValues: any[]): Query<doc>;
@@ -300,9 +311,9 @@ export type Query<doc extends DocumentData> = {
   endAt(snapshot: DocumentSnapshot<doc>): Query<doc>;
   endAt(...fieldValues: any[]): Query<doc>;
 
-  isEqual(other: Query<doc>): boolean;
+  readonly isEqual: (other: Query<doc>) => boolean;
 
-  get(options?: firestore.GetOptions): Promise<QuerySnapshot<doc>>;
+  readonly get: (options?: firestore.GetOptions) => Promise<QuerySnapshot<doc>>;
 
   onSnapshot(observer: {
     next?: (snapshot: QuerySnapshot<doc>) => void;
@@ -337,16 +348,16 @@ type QuerySnapshot<doc extends DocumentData> = {
   readonly size: number;
   readonly empty: boolean;
 
-  docChanges(
+  readonly docChanges: (
     options?: firestore.SnapshotListenOptions
-  ): Array<DocumentChange<doc>>;
+  ) => Array<DocumentChange<doc>>;
 
-  forEach(
+  readonly forEach: (
     callback: (result: QueryDocumentSnapshot<doc>) => void,
     thisArg?: any
-  ): void;
+  ) => void;
 
-  isEqual(other: QuerySnapshot<doc>): boolean;
+  readonly isEqual: (other: QuerySnapshot<doc>) => boolean;
 };
 
 export type DocumentChange<doc extends DocumentData> = {
@@ -363,9 +374,11 @@ export type TypedCollectionReference<
   readonly parent: TypedDocumentReference<docAndSub> | null;
   readonly path: string;
 
-  doc(documentPath?: string): TypedDocumentReference<docAndSub>;
+  readonly doc: (documentPath?: string) => TypedDocumentReference<docAndSub>;
 
-  add(data: docAndSub["doc"]): Promise<TypedDocumentReference<docAndSub>>;
+  readonly add: (
+    data: docAndSub["doc"]
+  ) => Promise<TypedDocumentReference<docAndSub>>;
 
-  isEqual(other: TypedCollectionReference<docAndSub>): boolean;
+  readonly isEqual: (other: TypedCollectionReference<docAndSub>) => boolean;
 };

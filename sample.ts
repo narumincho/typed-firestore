@@ -24,6 +24,7 @@ type User = {
   }
   userData.age;
   userData.openIdConnect.idInProvider;
+
   firestoreIns
     .collection("user")
     .where(new firestore.FieldPath("age"), "==", 32);
