@@ -31,7 +31,10 @@ export type ObjectValueType<T extends DocumentData> = ValueOf<
 >;
 
 export type DocumentData = {
-  [field in string]: firestorePrimitiveType | Array<firestorePrimitiveType>;
+  [field in string]:
+    | firestorePrimitiveType
+    | Array<firestorePrimitiveType>
+    | ReadonlyArray<firestorePrimitiveType>;
 };
 
 export type CollectionData = {
@@ -54,7 +57,10 @@ type firestorePrimitiveType =
   | number
   | firestore.GeoPoint
   | {
-      [field in string]: firestorePrimitiveType | Array<firestorePrimitiveType>;
+      [field in string]:
+        | firestorePrimitiveType
+        | Array<firestorePrimitiveType>
+        | ReadonlyArray<firestorePrimitiveType>;
     }
   | null
   | firestore.CollectionReference
@@ -350,7 +356,7 @@ type QuerySnapshot<doc extends DocumentData> = {
 
   readonly docChanges: (
     options?: firestore.SnapshotListenOptions
-  ) => Array<DocumentChange<doc>>;
+  ) => ReadonlyArray<DocumentChange<doc>>;
 
   readonly forEach: (
     callback: (result: QueryDocumentSnapshot<doc>) => void,
