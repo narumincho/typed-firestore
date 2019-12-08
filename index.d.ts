@@ -369,26 +369,3 @@ export type TypedCollectionReference<
 
   isEqual(other: TypedCollectionReference<docAndSub>): boolean;
 };
-
-export type FieldValueValue =
-  | "serverTimestamp"
-  | "delete"
-  | "arrayUnion"
-  | "arrayRemove"
-  | "increment";
-
-export class FieldValue<value extends FieldValueValue> {
-  private constructor();
-
-  static serverTimestamp(): FieldValue<"serverTimestamp">;
-
-  static delete(): FieldValue<"delete">;
-
-  static arrayUnion(...elements: any[]): FieldValue<"arrayUnion">;
-
-  static arrayRemove(...elements: any[]): FieldValue<"arrayRemove">;
-
-  static increment(n: number): FieldValue<"increment">;
-
-  isEqual(other: FieldValue<any>): boolean;
-}
