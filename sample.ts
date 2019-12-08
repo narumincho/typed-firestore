@@ -17,15 +17,16 @@ type User = {
 };
 
 (async () => {
-  const docRef = firestoreIns.collection("user").doc("faw");
-  const userData = (await docRef.get()).data();
-  if (userData === undefined) {
-    return;
-  }
-  userData.age;
-  userData.openIdConnect.idInProvider;
-
-  firestoreIns
+  const userQuerySnapshotArray = await firestoreIns
     .collection("user")
-    .where(new firestore.FieldPath("age"), "==", 32);
+    .where("age", "<=", 20)
+    .get();
+
+  for (const userQueryDocumentSnapshot of userQuerySnapshotArray.docs) {
+    console.log("name", userQueryDocumentSnapshot.data().name); // Type hint !!!!!
+    console.log(
+      "providerName",
+      userQueryDocumentSnapshot.data().openIdConnect.providerName
+    ); // Type hint !!!!!
+  }
 })();
