@@ -55,20 +55,6 @@ type ObjectToFiledPathAndValue<T extends DocumentData> = ValueOf<
   }
 >;
 
-export type R = ObjectToFiledPathAndValue<{
-  user: {
-    name: string;
-    id: string;
-    age: number;
-    account: {
-      id: string;
-      service: string;
-      nest: { nestNest: { nestNestNest: { superNest: number } } };
-    };
-  };
-  project: { name: string; createdAt: number };
-}>;
-
 export type DocumentData = {
   [field in string]: firestorePrimitiveType | Array<firestorePrimitiveType>;
 };
@@ -280,21 +266,11 @@ export class TypedDocumentReference<
   ): () => void;
 }
 
-/** Metadata about a snapshot, describing the state of the snapshot. */
-export interface SnapshotMetadata {
-  readonly hasPendingWrites: boolean;
-  readonly fromCache: boolean;
-
-  isEqual(other: SnapshotMetadata): boolean;
-}
-
-export class DocumentSnapshot<doc extends DocumentData> {
-  protected constructor();
-
+export type DocumentSnapshot<doc extends DocumentData> = {
   readonly exists: boolean;
   readonly ref: TypedDocumentReference<{ doc: doc; col: any }>;
   readonly id: string;
-  readonly metadata: SnapshotMetadata;
+  readonly metadata: firestore.SnapshotMetadata;
 
   data(options?: firestore.SnapshotOptions): doc | undefined;
 
@@ -308,14 +284,13 @@ export class DocumentSnapshot<doc extends DocumentData> {
   ): pathAndValue["value"] | undefined;
 
   isEqual(other: DocumentSnapshot<doc>): boolean;
-}
+};
 
-export class QueryDocumentSnapshot<
-  doc extends DocumentData
-> extends DocumentSnapshot<doc> {
-  private constructor();
+export type QueryDocumentSnapshot<doc extends DocumentData> = DocumentSnapshot<
+  doc
+> & {
   data(options?: firestore.SnapshotOptions): doc;
-}
+};
 
 export type Query<doc extends DocumentData> = {
   readonly firestore: TypedFirebaseFirestore<any>;
@@ -386,11 +361,9 @@ export type Query<doc extends DocumentData> = {
   ): () => void;
 };
 
-export class QuerySnapshot<doc extends DocumentData> {
-  private constructor();
-
+type QuerySnapshot<doc extends DocumentData> = {
   readonly query: Query<doc>;
-  readonly metadata: SnapshotMetadata;
+  readonly metadata: firestore.SnapshotMetadata;
   readonly docs: QueryDocumentSnapshot<doc>[];
   readonly size: number;
   readonly empty: boolean;
@@ -405,14 +378,14 @@ export class QuerySnapshot<doc extends DocumentData> {
   ): void;
 
   isEqual(other: QuerySnapshot<doc>): boolean;
-}
+};
 
-export interface DocumentChange<doc extends DocumentData> {
+export type DocumentChange<doc extends DocumentData> = {
   readonly type: firestore.DocumentChangeType;
   readonly doc: QueryDocumentSnapshot<any>;
   readonly oldIndex: number;
   readonly newIndex: number;
-}
+};
 
 export type TypedCollectionReference<
   docAndSub extends DocumentAndSubCollectionData
