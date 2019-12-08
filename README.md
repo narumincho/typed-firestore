@@ -15,14 +15,19 @@ import * as typedFirestore from "typed-firestore";
 firebase.initializeApp({...});
 
 const firestore = firebase.firestore() as typedFirestore.TypedFirebaseFirestore<{
-  name: string;
-  age: number;
-  openIdConnect: {
-    providerName: string;
-    idInProvider: string;
+  user: {
+    doc: {
+      name: string;
+      age: number;
+      openIdConnect: {
+        providerName: string;
+        idInProvider: string;
+      };
+      playlist: Array<string>;
+      createdAt: firestore.Timestamp;
+    };
+    col: {};  // sub collection
   };
-  playlist: Array<string>;
-  createdAt: firestore.Timestamp;
 }>;
 
 // Type hint !!!!!
@@ -49,14 +54,19 @@ import * as typedFirestore from "typed-firestore";
 
 const app = admin.initializeApp();
 const firestore = app.firestore() as typedFirestore.TypedFirebaseFirestore<{
-  name: string;
-  age: number;
-  openIdConnect: {
-    providerName: string;
-    idInProvider: string;
+  user: {
+    doc: {
+      name: string;
+      age: number;
+      openIdConnect: {
+        providerName: string;
+        idInProvider: string;
+      };
+      playlist: Array<string>;
+      createdAt: firestore.Timestamp;
+    };
+    col: {}; // sub collection
   };
-  playlist: Array<string>;
-  createdAt: firestore.Timestamp;
 }>;
 
 // Type hint !!!!!
