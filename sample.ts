@@ -2,8 +2,19 @@ import * as f from "./index";
 import * as firestore from "@firebase/firestore-types";
 
 const firestoreIns = {} as f.TypedFirebaseFirestore<{
-  user: { doc: { name: string; age: number }; col: {} };
+  user: { doc: User; col: {} };
 }>;
+
+type User = {
+  name: string;
+  age: number;
+  openIdConnect: {
+    providerName: string;
+    idInProvider: string;
+  };
+  playlist: Array<string>;
+  createdAt: firestore.Timestamp;
+};
 
 (async () => {
   const docRef = firestoreIns.collection("user").doc("faw");
@@ -12,5 +23,8 @@ const firestoreIns = {} as f.TypedFirebaseFirestore<{
     return;
   }
   userData.age;
-  firestoreIns.runTransaction(tra => tra.delete(docRef).get(docRef));
+  userData.openIdConnect.idInProvider;
+  firestoreIns
+    .collection("user")
+    .where(new firestore.FieldPath("age"), "==", 32);
 })();

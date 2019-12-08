@@ -22,36 +22,11 @@ import * as firestore from "@firebase/firestore-types";
 
 type ValueOf<T> = T[keyof T];
 
-type ObjectToFiledPathAndValue<T extends DocumentData> = ValueOf<
+export type ObjectValueType<T extends DocumentData> = ValueOf<
   {
-    [k0 in keyof T & string]:
-      | { path: [k0]; value: T[k0] }
-      | (T[k0] extends DocumentData
-          ? ValueOf<
-              {
-                [k1 in keyof T[k0] & string]:
-                  | { path: [k0, k1]; value: T[k0][k1] }
-                  | (T[k0][k1] extends DocumentData
-                      ? ValueOf<
-                          {
-                            [k2 in keyof T[k0][k1] & string]:
-                              | { path: [k0, k1, k2]; value: T[k0][k1][k2] }
-                              | (T[k0][k1][k2] extends DocumentData
-                                  ? ValueOf<
-                                      {
-                                        [k3 in keyof T[k0][k1][k2] & string]: {
-                                          path: [k0, k1, k2, k3];
-                                          value: T[k0][k1][k2][k3];
-                                        };
-                                      }
-                                    >
-                                  : never);
-                          }
-                        >
-                      : never);
-              }
-            >
-          : never);
+    [k0 in keyof T]:
+      | T[k0]
+      | (T[k0] extends DocumentData ? ObjectValueType<T[k0]> : never);
   }
 >;
 
@@ -153,13 +128,10 @@ export type Transaction = {
     ...moreFieldsAndValues: any[]
   ): Transaction;
 
-  update<
-    docAndSub extends DocumentAndSubCollectionData,
-    pathAndValue extends ObjectToFiledPathAndValue<docAndSub["doc"]>
-  >(
+  update<docAndSub extends DocumentAndSubCollectionData>(
     documentRef: TypedDocumentReference<docAndSub>,
-    field: FieldPath<pathAndValue["path"]>,
-    value: pathAndValue["value"],
+    field: firestore.FieldPath,
+    value: ObjectValueType<docAndSub["doc"]>,
     ...moreFieldsAndValues: any[]
   ): Transaction;
 
@@ -188,13 +160,10 @@ type WriteBatch = {
     ...moreFieldsAndValues: any[]
   ): WriteBatch;
 
-  update<
-    docAndSub extends DocumentAndSubCollectionData,
-    pathAndValue extends ObjectToFiledPathAndValue<docAndSub["doc"]>
-  >(
+  update<docAndSub extends DocumentAndSubCollectionData>(
     documentRef: TypedDocumentReference<docAndSub>,
-    field: FieldPath<pathAndValue["path"]>,
-    value: pathAndValue["value"],
+    field: firestore.FieldPath,
+    value: ObjectValueType<docAndSub["doc"]>,
     ...moreFieldsAndValues: any[]
   ): WriteBatch;
 
@@ -228,9 +197,9 @@ export class TypedDocumentReference<
     value: docAndSub["doc"][path],
     ...moreFieldsAndValues: any[]
   ): Promise<void>;
-  update<pathAndValue extends ObjectToFiledPathAndValue<docAndSub["doc"]>>(
-    field: FieldPath<pathAndValue["path"]>,
-    value: pathAndValue["value"],
+  update(
+    field: firestore.FieldPath,
+    value: ObjectValueType<docAndSub["doc"]>,
     ...moreFieldsAndValues: any[]
   ): Promise<void>;
 
@@ -278,10 +247,10 @@ export type DocumentSnapshot<doc extends DocumentData> = {
     fieldPath: path,
     options?: firestore.SnapshotOptions
   ): doc[path] | undefined;
-  get<pathAndValue extends ObjectToFiledPathAndValue<doc>>(
-    fieldPath: FieldPath<pathAndValue["path"]>,
+  get(
+    fieldPath: firestore.FieldPath,
     options?: firestore.SnapshotOptions
-  ): pathAndValue["value"] | undefined;
+  ): ObjectValueType<doc> | undefined;
 
   isEqual(other: DocumentSnapshot<doc>): boolean;
 };
@@ -300,18 +269,18 @@ export type Query<doc extends DocumentData> = {
     opStr: firestore.WhereFilterOp,
     value: doc[path]
   ): Query<doc>;
-  where<pathAndValue extends ObjectToFiledPathAndValue<doc>>(
-    fieldPath: FieldPath<pathAndValue["path"]>,
+  where(
+    fieldPath: firestore.FieldPath,
     opStr: firestore.WhereFilterOp,
-    value: pathAndValue["value"]
+    value: ObjectValueType<doc>
   ): Query<doc>;
 
   orderBy<path extends keyof doc & string>(
     fieldPath: path,
     directionStr?: firestore.OrderByDirection
   ): Query<doc>;
-  orderBy<pathAndValue extends ObjectToFiledPathAndValue<doc>>(
-    fieldPath: FieldPath<pathAndValue["path"]>,
+  orderBy(
+    fieldPath: firestore.FieldPath,
     directionStr?: firestore.OrderByDirection
   ): Query<doc>;
 
@@ -422,12 +391,4 @@ export class FieldValue<value extends FieldValueValue> {
   static increment(n: number): FieldValue<"increment">;
 
   isEqual(other: FieldValue<any>): boolean;
-}
-
-export class FieldPath<path extends string[]> {
-  constructor(...fieldNames: path);
-
-  static documentId<path extends string[]>(): FieldPath<path>;
-
-  isEqual(other: FieldPath<any>): boolean;
 }

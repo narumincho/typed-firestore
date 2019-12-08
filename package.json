@@ -1,9 +1,8 @@
 {
   "name": "typed-firestore",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "stronger type for @firebase/firestore-types",
-  "main": "distribution/index.js",
-  "types": "distribution/index.d.ts",
+  "types": "index.d.ts",
   "author": "narumincho <narumincho.starfy@gmail.com> (https://narumincho.com)",
   "license": "Apache-2.0",
   "repository": {
@@ -11,8 +10,8 @@
     "url": "https://github.com/narumincho/typed-firestore.git"
   },
   "dependencies": {
-    "@firebase/app-types": "^0.4.8",
-    "@firebase/firestore-types": "^1.8.0"
+    "@firebase/app-types": "^0.4.9",
+    "@firebase/firestore-types": "^1.8.1"
   },
   "devDependencies": {
     "typescript": "^3.7.3"
