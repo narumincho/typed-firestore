@@ -1,7 +1,7 @@
 import * as f from "./index";
 import * as firestore from "@firebase/firestore-types";
 
-const firestoreIns = {} as f.TypedFirebaseFirestore<{
+const firestoreIns = (({} as firestore.FirebaseFirestore) as unknown) as f.TypedFirebaseFirestore<{
   user: { doc: User; col: {} };
 }>;
 

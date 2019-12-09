@@ -14,7 +14,7 @@ import * as typedFirestore from "typed-firestore";
 
 firebase.initializeApp({...});
 
-const firestore = firebase.firestore() as typedFirestore.TypedFirebaseFirestore<{
+const firestore = (firebase.firestore() as unknown) as typedFirestore.TypedFirebaseFirestore<{
   user: {
     doc: {
       name: string;
@@ -53,7 +53,7 @@ import * as admin from "firebase-admin";
 import * as typedFirestore from "typed-firestore";
 
 const app = admin.initializeApp();
-const firestore = app.firestore() as typedFirestore.TypedFirebaseFirestore<{
+const firestore = (app.firestore() as unknown) as typedFirestore.TypedFirebaseFirestore<{
   user: {
     doc: {
       name: string;
