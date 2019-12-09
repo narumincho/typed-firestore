@@ -284,8 +284,26 @@ export type Query<doc extends DocumentData> = {
 
   where<path extends keyof doc & string>(
     fieldPath: path,
-    opStr: firestore.WhereFilterOp,
+    opStr: "<" | "<=" | "==" | ">=" | ">",
     value: doc[path]
+  ): Query<doc>;
+
+  where<path extends keyof doc & string>(
+    fieldPath: path,
+    opStr: "array-contains",
+    value: doc[path] extends Array<infer V> ? V : never
+  ): Query<doc>;
+
+  where<path extends keyof doc & string>(
+    fieldPath: path,
+    opStr: "in",
+    value: Array<doc[path]>
+  ): Query<doc>;
+
+  where<path extends keyof doc & string>(
+    fieldPath: path,
+    opStr: "array-contains-any",
+    value: doc[path] extends Array<infer V> ? Array<V> : never
   ): Query<doc>;
 
   where(
