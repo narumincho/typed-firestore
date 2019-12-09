@@ -67,7 +67,9 @@ type firestorePrimitiveType =
   | firestore.DocumentReference
   | string;
 
-export type UpdateData = { [fieldPath in string]: any };
+export type UpdateData<doc extends DocumentData> = Partial<
+  { [key in keyof doc]: key | firestore.FieldValue }
+>;
 
 type TypedFirebaseFirestore<col extends CollectionData> = {
   readonly settings: (settings: firestore.Settings) => void;
@@ -127,7 +129,7 @@ export type Transaction = {
 
   update<docAndSub extends DocumentAndSubCollectionData>(
     documentRef: TypedDocumentReference<docAndSub>,
-    data: UpdateData
+    data: UpdateData<docAndSub["doc"]>
   ): Transaction;
 
   update<
@@ -203,7 +205,7 @@ export type TypedDocumentReference<
     options?: firestore.SetOptions
   ) => Promise<void>;
 
-  update(data: UpdateData): Promise<void>;
+  update(data: UpdateData<docAndSub["doc"]>): Promise<void>;
 
   update<path extends keyof docAndSub["doc"] & string>(
     field: path,
