@@ -112,8 +112,6 @@ type FirebaseFirestore<col extends CollectionData> = {
   onSnapshotsInSync(onSync: () => void): () => void;
 
   readonly terminate: () => Promise<void>;
-
-  readonly INTERNAL: { delete: () => Promise<void> };
 };
 
 type Transaction = {
