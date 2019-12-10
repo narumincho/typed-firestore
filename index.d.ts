@@ -22,7 +22,7 @@ import * as firestore from "@firebase/firestore-types";
 
 type ValueOf<T> = T[keyof T];
 
-export type ObjectValueType<T extends DocumentData> = ValueOf<
+type ObjectValueType<T extends DocumentData> = ValueOf<
   {
     [k0 in keyof T]:
       | T[k0]
@@ -30,18 +30,18 @@ export type ObjectValueType<T extends DocumentData> = ValueOf<
   }
 >;
 
-export type DocumentData = {
+type DocumentData = {
   [field in string]:
-    | firestorePrimitiveType
-    | Array<firestorePrimitiveType>
-    | ReadonlyArray<firestorePrimitiveType>;
+    | FirestorePrimitiveType
+    | Array<FirestorePrimitiveType>
+    | ReadonlyArray<FirestorePrimitiveType>;
 };
 
-export type CollectionData = {
+type CollectionData = {
   [key in string]: DocumentAndSubCollectionData;
 };
 
-export type DocumentAndSubCollectionData = {
+type DocumentAndSubCollectionData = {
   doc: DocumentData;
   col: CollectionData;
 };
@@ -50,7 +50,7 @@ type GetIncludeDocument<col extends CollectionData> = ValueOf<
   { [key in keyof col]: col[key]["doc"] | GetIncludeDocument<col[key]["col"]> }
 >;
 
-type firestorePrimitiveType =
+type FirestorePrimitiveType =
   | boolean
   | firestore.Blob
   | firestore.Timestamp
@@ -58,16 +58,16 @@ type firestorePrimitiveType =
   | firestore.GeoPoint
   | {
       [field in string]:
-        | firestorePrimitiveType
-        | Array<firestorePrimitiveType>
-        | ReadonlyArray<firestorePrimitiveType>;
+        | FirestorePrimitiveType
+        | Array<FirestorePrimitiveType>
+        | ReadonlyArray<FirestorePrimitiveType>;
     }
   | null
   | firestore.CollectionReference
   | firestore.DocumentReference
   | string;
 
-export type UpdateData<doc extends DocumentData> = Partial<
+type UpdateData<doc extends DocumentData> = Partial<
   { [key in keyof doc]: key | firestore.FieldValue }
 >;
 
@@ -116,7 +116,7 @@ type FirebaseFirestore<col extends CollectionData> = {
   readonly INTERNAL: { delete: () => Promise<void> };
 };
 
-export type Transaction = {
+type Transaction = {
   readonly get: <docAndSub extends DocumentAndSubCollectionData>(
     documentRef: DocumentReference<docAndSub>
   ) => Promise<DocumentSnapshot<docAndSub["doc"]>>;
@@ -186,9 +186,7 @@ type WriteBatch = {
   readonly commit: () => Promise<void>;
 };
 
-export type DocumentReference<
-  docAndSub extends DocumentAndSubCollectionData
-> = {
+type DocumentReference<docAndSub extends DocumentAndSubCollectionData> = {
   readonly id: string;
   readonly firestore: FirebaseFirestore<any>;
   readonly parent: CollectionReference<docAndSub>;
@@ -254,7 +252,7 @@ export type DocumentReference<
   ): () => void;
 };
 
-export type DocumentSnapshot<doc extends DocumentData> = {
+type DocumentSnapshot<doc extends DocumentData> = {
   readonly exists: boolean;
   readonly ref: DocumentReference<{ doc: doc; col: any }>;
   readonly id: string;
@@ -279,7 +277,7 @@ interface QueryDocumentSnapshot<doc extends DocumentData>
   readonly data: (options?: firestore.SnapshotOptions) => doc;
 }
 
-export type Query<doc extends DocumentData> = {
+type Query<doc extends DocumentData> = {
   readonly firestore: FirebaseFirestore<any>;
 
   where<path extends keyof doc & string>(
@@ -387,14 +385,14 @@ type QuerySnapshot<doc extends DocumentData> = {
   readonly isEqual: (other: QuerySnapshot<doc>) => boolean;
 };
 
-export type DocumentChange<doc extends DocumentData> = {
+type DocumentChange<doc extends DocumentData> = {
   readonly type: firestore.DocumentChangeType;
   readonly doc: QueryDocumentSnapshot<any>;
   readonly oldIndex: number;
   readonly newIndex: number;
 };
 
-export type CollectionReference<
+type CollectionReference<
   docAndSub extends DocumentAndSubCollectionData
 > = Query<docAndSub["doc"]> & {
   readonly id: string;
