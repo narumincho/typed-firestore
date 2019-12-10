@@ -5,6 +5,8 @@
 
 type support for firebase firestore.
 
+[typed-admin-firestore](https://github.com/narumincho/typed-admin-firestore)
+
 ## client
 
 ```ts
