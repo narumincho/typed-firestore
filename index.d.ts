@@ -71,7 +71,7 @@ export type UpdateData<doc extends DocumentData> = Partial<
   { [key in keyof doc]: key | firestore.FieldValue }
 >;
 
-type TypedFirebaseFirestore<col extends CollectionData> = {
+type FirebaseFirestore<col extends CollectionData> = {
   readonly settings: (settings: firestore.Settings) => void;
 
   readonly enablePersistence: (
@@ -80,11 +80,11 @@ type TypedFirebaseFirestore<col extends CollectionData> = {
 
   readonly collection: <collectionPath extends keyof col>(
     collectionPath: collectionPath
-  ) => TypedCollectionReference<col[collectionPath]>;
+  ) => CollectionReference<col[collectionPath]>;
 
   readonly doc: <documentPath extends keyof col>(
     documentPath: documentPath
-  ) => TypedDocumentReference<col[documentPath]>;
+  ) => DocumentReference<col[documentPath]>;
 
   readonly collectionGroup: (collectionId: string) => Query<any>;
 
@@ -118,17 +118,17 @@ type TypedFirebaseFirestore<col extends CollectionData> = {
 
 export type Transaction = {
   readonly get: <docAndSub extends DocumentAndSubCollectionData>(
-    documentRef: TypedDocumentReference<docAndSub>
+    documentRef: DocumentReference<docAndSub>
   ) => Promise<DocumentSnapshot<docAndSub["doc"]>>;
 
   set: <docAndSub extends DocumentAndSubCollectionData>(
-    documentRef: TypedDocumentReference<docAndSub>,
+    documentRef: DocumentReference<docAndSub>,
     data: docAndSub["doc"],
     options?: firestore.SetOptions
   ) => Transaction;
 
   update<docAndSub extends DocumentAndSubCollectionData>(
-    documentRef: TypedDocumentReference<docAndSub>,
+    documentRef: DocumentReference<docAndSub>,
     data: UpdateData<docAndSub["doc"]>
   ): Transaction;
 
@@ -136,14 +136,14 @@ export type Transaction = {
     docAndSub extends DocumentAndSubCollectionData,
     path extends keyof docAndSub["doc"] & string
   >(
-    documentRef: TypedDocumentReference<docAndSub>,
+    documentRef: DocumentReference<docAndSub>,
     field: path,
     value: docAndSub["doc"][path],
     ...moreFieldsAndValues: any[]
   ): Transaction;
 
   update<docAndSub extends DocumentAndSubCollectionData>(
-    documentRef: TypedDocumentReference<docAndSub>,
+    documentRef: DocumentReference<docAndSub>,
     field: firestore.FieldPath,
     value: ObjectValueType<docAndSub["doc"]>,
     ...moreFieldsAndValues: any[]
@@ -154,13 +154,13 @@ export type Transaction = {
 
 type WriteBatch = {
   set: <docAndSub extends DocumentAndSubCollectionData>(
-    documentRef: TypedDocumentReference<docAndSub>,
+    documentRef: DocumentReference<docAndSub>,
     data: docAndSub["doc"],
     options?: firestore.SetOptions
   ) => WriteBatch;
 
   update<docAndSub extends DocumentAndSubCollectionData>(
-    documentRef: TypedDocumentReference<docAndSub>,
+    documentRef: DocumentReference<docAndSub>,
     data: docAndSub["doc"]
   ): WriteBatch;
 
@@ -168,14 +168,14 @@ type WriteBatch = {
     docAndSub extends DocumentAndSubCollectionData,
     path extends keyof docAndSub["doc"] & string
   >(
-    documentRef: TypedDocumentReference<docAndSub>,
+    documentRef: DocumentReference<docAndSub>,
     field: path,
     value: docAndSub["doc"][path],
     ...moreFieldsAndValues: any[]
   ): WriteBatch;
 
   update<docAndSub extends DocumentAndSubCollectionData>(
-    documentRef: TypedDocumentReference<docAndSub>,
+    documentRef: DocumentReference<docAndSub>,
     field: firestore.FieldPath,
     value: ObjectValueType<docAndSub["doc"]>,
     ...moreFieldsAndValues: any[]
@@ -186,19 +186,19 @@ type WriteBatch = {
   readonly commit: () => Promise<void>;
 };
 
-export type TypedDocumentReference<
+export type DocumentReference<
   docAndSub extends DocumentAndSubCollectionData
 > = {
   readonly id: string;
-  readonly firestore: TypedFirebaseFirestore<any>;
-  readonly parent: TypedCollectionReference<docAndSub>;
+  readonly firestore: FirebaseFirestore<any>;
+  readonly parent: CollectionReference<docAndSub>;
   readonly path: string;
 
   readonly collection: <collectionPath extends keyof docAndSub["col"]>(
     collectionPath: collectionPath
-  ) => TypedCollectionReference<docAndSub["col"][collectionPath]>;
+  ) => CollectionReference<docAndSub["col"][collectionPath]>;
 
-  readonly isEqual: (other: TypedDocumentReference<docAndSub>) => boolean;
+  readonly isEqual: (other: DocumentReference<docAndSub>) => boolean;
 
   readonly set: (
     data: DocumentData,
@@ -256,7 +256,7 @@ export type TypedDocumentReference<
 
 export type DocumentSnapshot<doc extends DocumentData> = {
   readonly exists: boolean;
-  readonly ref: TypedDocumentReference<{ doc: doc; col: any }>;
+  readonly ref: DocumentReference<{ doc: doc; col: any }>;
   readonly id: string;
   readonly metadata: firestore.SnapshotMetadata;
 
@@ -280,7 +280,7 @@ interface QueryDocumentSnapshot<doc extends DocumentData>
 }
 
 export type Query<doc extends DocumentData> = {
-  readonly firestore: TypedFirebaseFirestore<any>;
+  readonly firestore: FirebaseFirestore<any>;
 
   where<path extends keyof doc & string>(
     fieldPath: path,
@@ -394,18 +394,18 @@ export type DocumentChange<doc extends DocumentData> = {
   readonly newIndex: number;
 };
 
-export type TypedCollectionReference<
+export type CollectionReference<
   docAndSub extends DocumentAndSubCollectionData
 > = Query<docAndSub["doc"]> & {
   readonly id: string;
-  readonly parent: TypedDocumentReference<docAndSub> | null;
+  readonly parent: DocumentReference<docAndSub> | null;
   readonly path: string;
 
-  readonly doc: (documentPath?: string) => TypedDocumentReference<docAndSub>;
+  readonly doc: (documentPath?: string) => DocumentReference<docAndSub>;
 
   readonly add: (
     data: docAndSub["doc"]
-  ) => Promise<TypedDocumentReference<docAndSub>>;
+  ) => Promise<DocumentReference<docAndSub>>;
 
-  readonly isEqual: (other: TypedCollectionReference<docAndSub>) => boolean;
+  readonly isEqual: (other: CollectionReference<docAndSub>) => boolean;
 };
