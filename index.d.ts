@@ -71,7 +71,7 @@ type UpdateData<doc extends DocumentData> = Partial<
   { [key in keyof doc]: doc[key] | firestore.FieldValue }
 >;
 
-type FirebaseFirestore<col extends CollectionData> = {
+type Firestore<col extends CollectionData> = {
   readonly settings: (settings: firestore.Settings) => void;
 
   readonly enablePersistence: (
