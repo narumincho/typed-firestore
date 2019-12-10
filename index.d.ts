@@ -68,7 +68,7 @@ type FirestorePrimitiveType =
   | string;
 
 type UpdateData<doc extends DocumentData> = Partial<
-  { [key in keyof doc]: key | firestore.FieldValue }
+  { [key in keyof doc]: doc[key] | firestore.FieldValue }
 >;
 
 type FirebaseFirestore<col extends CollectionData> = {
@@ -121,7 +121,7 @@ type Transaction = {
     documentRef: DocumentReference<docAndSub>
   ) => Promise<DocumentSnapshot<docAndSub["doc"]>>;
 
-  set: <docAndSub extends DocumentAndSubCollectionData>(
+  readonly set: <docAndSub extends DocumentAndSubCollectionData>(
     documentRef: DocumentReference<docAndSub>,
     data: docAndSub["doc"],
     options?: firestore.SetOptions
