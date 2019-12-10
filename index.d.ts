@@ -385,7 +385,7 @@ type QuerySnapshot<doc extends DocumentData> = {
 
 type DocumentChange<doc extends DocumentData> = {
   readonly type: firestore.DocumentChangeType;
-  readonly doc: QueryDocumentSnapshot<any>;
+  readonly doc: QueryDocumentSnapshot<doc>;
   readonly oldIndex: number;
   readonly newIndex: number;
 };
