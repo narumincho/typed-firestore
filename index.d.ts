@@ -554,7 +554,7 @@ type DocumentReference<docAndSub extends DocumentAndSubCollectionData> = {
    * to the backend (Note that it won't resolve while you're offline).
    */
   readonly set: (
-    data: DocumentData,
+    data: UpdateData<docAndSub["doc"]>,
     options?: firestore.SetOptions
   ) => Promise<void>;
 
