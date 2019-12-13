@@ -1,9 +1,12 @@
 import * as f from "./index";
 import * as firestore from "@firebase/firestore-types";
 
-const firestoreIns = (({} as firestore.FirebaseFirestore) as unknown) as f.FirebaseFirestore<{
-  user: { doc: User; col: {} };
+const firestoreInstance = (({} as firestore.FirebaseFirestore) as unknown) as f.Firestore<{
+  user: { key: UserId; doc: User; col: {} };
+  music: { key: MusicId; doc: Music; col: {} };
 }>;
+
+type UserId = string & { _userId: never };
 
 type User = {
   name: string;
@@ -12,21 +15,31 @@ type User = {
     providerName: string;
     idInProvider: string;
   };
-  playlist: Array<string>;
+  likedMusics: Array<MusicId>;
   createdAt: firestore.Timestamp;
 };
 
+type MusicId = string & { _musicId: never };
+
+type Music = {
+  title: string;
+  artist: UserId;
+};
+
 (async () => {
-  const userQuerySnapshotArray = await firestoreIns
+  const userQuerySnapshotArray = await firestoreInstance
     .collection("user")
     .where("age", "<=", 20)
     .get();
 
   for (const userQueryDocumentSnapshot of userQuerySnapshotArray.docs) {
-    console.log("name", userQueryDocumentSnapshot.data().name); // Type hint !!!!!
-    console.log(
-      "providerName",
-      userQueryDocumentSnapshot.data().openIdConnect.providerName
-    ); // Type hint !!!!!
+    const data = userQueryDocumentSnapshot.data();
+    console.log("name", data.name); // Type hint !!!!!
+    console.log("providerName", data.openIdConnect.providerName); // Type hint !!!!!
+
+    for (const likedMusicId of data.likedMusics) {
+      firestoreInstance.collection("music").doc(likedMusicId); // no error !!!
+      firestoreInstance.collection("user").doc(likedMusicId); // error !!!
+    }
   }
 })();

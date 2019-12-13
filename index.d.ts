@@ -46,6 +46,7 @@ type CollectionData = {
 };
 
 type DocumentAndSubCollectionData = {
+  key: string;
   doc: DocumentData;
   col: CollectionData;
 };
@@ -505,7 +506,7 @@ type DocumentReference<docAndSub extends DocumentAndSubCollectionData> = {
   /**
    * The document's identifier within its collection.
    */
-  readonly id: string;
+  readonly id: docAndSub["key"];
 
   /**
    * The {@link firebase.firestore.Firestore} the document is in.
@@ -724,7 +725,7 @@ type DocumentSnapshot<doc extends DocumentData> = {
   /**
    * The `DocumentReference` for the document included in the `DocumentSnapshot`.
    */
-  readonly ref: DocumentReference<{ doc: doc; col: any }>;
+  readonly ref: DocumentReference<{ key: string; doc: doc; col: any }>;
 
   /**
    * Property of the `DocumentSnapshot` that provides the document's ID.
@@ -1224,7 +1225,9 @@ type CollectionReference<
    * @param documentPath A slash-separated path to a document.
    * @return The `DocumentReference` instance.
    */
-  readonly doc: (documentPath?: string) => DocumentReference<docAndSub>;
+  readonly doc: (
+    documentPath?: docAndSub["key"]
+  ) => DocumentReference<docAndSub>;
 
   /**
    * Add a new document to this collection with the specified data, assigning
