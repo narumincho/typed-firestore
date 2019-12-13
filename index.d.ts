@@ -86,6 +86,18 @@ type UpdateData<doc extends DocumentData> = Partial<
   { [key in keyof doc]: doc[key] | firestore.FieldValue }
 >;
 
+type SetData<doc extends DocumentData> = {
+  [key in keyof doc]: doc[key] | firestore.FieldValue;
+};
+
+type SetDataMargeTrue<doc extends DocumentData> = Partial<
+  {
+    [key in keyof doc]:
+      | (doc[key] extends DocumentData ? SetDataMargeTrue<doc[key]> : doc[key])
+      | firestore.FieldValue;
+  }
+>;
+
 type Firestore<col extends CollectionsData> = {
   /**
    * Specifies custom settings to be used to configure the `Firestore`
@@ -344,12 +356,17 @@ type Transaction = {
    * @param options An object to configure the set behavior.
    * @return This `Transaction` instance. Used for chaining method calls.
    */
-  readonly set: <docAndSub extends DocumentAndSubCollectionData>(
+  set<docAndSub extends DocumentAndSubCollectionData>(
     documentRef: DocumentReference<docAndSub>,
-    data: docAndSub["value"],
-    options?: firestore.SetOptions
-  ) => Transaction;
+    data: SetDataMargeTrue<docAndSub["value"]>,
+    options: { merge: true }
+  ): Transaction;
 
+  set<docAndSub extends DocumentAndSubCollectionData>(
+    documentRef: DocumentReference<docAndSub>,
+    data: SetData<docAndSub["value"]>,
+    options?: firestore.SetOptions
+  ): Transaction;
   /**
    * Updates fields in the document referred to by the provided
    * `DocumentReference`. The update will fail if applied to a document that
@@ -429,11 +446,17 @@ type WriteBatch = {
    * @param options An object to configure the set behavior.
    * @return This `WriteBatch` instance. Used for chaining method calls.
    */
-  set: <docAndSub extends DocumentAndSubCollectionData>(
+  set<docAndSub extends DocumentAndSubCollectionData>(
     documentRef: DocumentReference<docAndSub>,
-    data: docAndSub["value"],
+    data: SetDataMargeTrue<docAndSub["value"]>,
+    options: { merge: true }
+  ): WriteBatch;
+
+  set<docAndSub extends DocumentAndSubCollectionData>(
+    documentRef: DocumentReference<docAndSub>,
+    data: SetData<docAndSub["value"]>,
     options?: firestore.SetOptions
-  ) => WriteBatch;
+  ): WriteBatch;
 
   /**
    * Updates fields in the document referred to by the provided
@@ -448,7 +471,7 @@ type WriteBatch = {
    */
   update<docAndSub extends DocumentAndSubCollectionData>(
     documentRef: DocumentReference<docAndSub>,
-    data: docAndSub["value"]
+    data: UpdateData<docAndSub["value"]>
   ): WriteBatch;
 
   /**
@@ -560,11 +583,15 @@ type DocumentReference<docAndSub extends DocumentAndSubCollectionData> = {
    * @return A Promise resolved once the data has been successfully written
    * to the backend (Note that it won't resolve while you're offline).
    */
-  readonly set: (
-    data: UpdateData<docAndSub["value"]>,
-    options?: firestore.SetOptions
-  ) => Promise<void>;
+  set(
+    data: SetDataMargeTrue<docAndSub["value"]>,
+    options: { merge: true }
+  ): Promise<void>;
 
+  set(
+    data: SetData<docAndSub["value"]>,
+    options?: firestore.SetOptions
+  ): Promise<void>;
   /**
    * Updates fields in the document referred to by this `DocumentReference`.
    * The update will fail if applied to a document that does not exist.
