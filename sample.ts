@@ -2,8 +2,8 @@ import * as f from "./index";
 import * as firestore from "@firebase/firestore-types";
 
 const firestoreInstance = (({} as firestore.FirebaseFirestore) as unknown) as f.Firestore<{
-  user: { key: UserId; doc: User; col: {} };
-  music: { key: MusicId; doc: Music; col: {} };
+  user: { key: UserId; value: User; subCollections: {} };
+  music: { key: MusicId; value: Music; subCollections: {} };
 }>;
 
 type UserId = string & { _userId: never };

@@ -17,8 +17,8 @@ import * as typedFirestore from "typed-firestore";
 firebase.initializeApp({...});
 
 const firestoreInstance = (firebase.firestore() as unknown) as f.Firestore<{
-  user: { key: UserId; doc: User; col: {} };
-  music: { key: MusicId; doc: Music; col: {} };
+  user: { key: UserId; value: User; subCollections: {} };
+  music: { key: MusicId; value: Music; subCollections: {} };
 }>;
 
 type UserId = string & { _userId: never };
