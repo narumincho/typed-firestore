@@ -164,7 +164,9 @@ type Firestore<col extends CollectionsData> = {
    * will be included. Cannot contain a slash.
    * @return The created Query.
    */
-  readonly collectionGroup: (collectionId: string) => Query<any>;
+  readonly collectionGroup: <key extends string, value extends DocumentData>(
+    collectionId: string
+  ) => Query<key, value>;
 
   /**
    * Executes the given `updateFunction` and then attempts to commit the changes
@@ -344,7 +346,7 @@ type Transaction = {
    */
   readonly get: <docAndSub extends DocumentAndSubCollectionData>(
     documentRef: DocumentReference<docAndSub>
-  ) => Promise<DocumentSnapshot<docAndSub["value"]>>;
+  ) => Promise<DocumentSnapshot<docAndSub["key"], docAndSub["value"]>>;
 
   /**
    * Writes to the document referred to by the provided `DocumentReference`.
@@ -652,7 +654,7 @@ type DocumentReference<docAndSub extends DocumentAndSubCollectionData> = {
    */
   readonly get: (
     options?: firestore.GetOptions
-  ) => Promise<DocumentSnapshot<docAndSub["value"]>>;
+  ) => Promise<DocumentSnapshot<docAndSub["key"], docAndSub["value"]>>;
 
   /**
    * Attaches a listener for DocumentSnapshot events. You may either pass
@@ -667,7 +669,9 @@ type DocumentReference<docAndSub extends DocumentAndSubCollectionData> = {
    * the snapshot listener.
    */
   onSnapshot(observer: {
-    next?: (snapshot: DocumentSnapshot<docAndSub["value"]>) => void;
+    next?: (
+      snapshot: DocumentSnapshot<docAndSub["key"], docAndSub["value"]>
+    ) => void;
     error?: (error: firestore.FirestoreError) => void;
     complete?: () => void;
   }): () => void;
@@ -688,7 +692,9 @@ type DocumentReference<docAndSub extends DocumentAndSubCollectionData> = {
   onSnapshot(
     options: firestore.SnapshotListenOptions,
     observer: {
-      next?: (snapshot: DocumentSnapshot<docAndSub["value"]>) => void;
+      next?: (
+        snapshot: DocumentSnapshot<docAndSub["key"], docAndSub["value"]>
+      ) => void;
       error?: (error: Error) => void;
       complete?: () => void;
     }
@@ -710,7 +716,9 @@ type DocumentReference<docAndSub extends DocumentAndSubCollectionData> = {
    * the snapshot listener.
    */
   onSnapshot(
-    onNext: (snapshot: DocumentSnapshot<docAndSub["value"]>) => void,
+    onNext: (
+      snapshot: DocumentSnapshot<docAndSub["key"], docAndSub["value"]>
+    ) => void,
     onError?: (error: Error) => void,
     onCompletion?: () => void
   ): () => void;
@@ -733,7 +741,9 @@ type DocumentReference<docAndSub extends DocumentAndSubCollectionData> = {
    */
   onSnapshot(
     options: firestore.SnapshotListenOptions,
-    onNext: (snapshot: DocumentSnapshot<docAndSub["value"]>) => void,
+    onNext: (
+      snapshot: DocumentSnapshot<docAndSub["key"], docAndSub["value"]>
+    ) => void,
     onError?: (error: Error) => void,
     onCompletion?: () => void
   ): () => void;
@@ -748,7 +758,7 @@ type DocumentReference<docAndSub extends DocumentAndSubCollectionData> = {
  * access will return 'undefined'. You can use the `exists` property to
  * explicitly verify a document's existence.
  */
-type DocumentSnapshot<doc extends DocumentData> = {
+type DocumentSnapshot<key extends string, doc extends DocumentData> = {
   /**
    * Property of the `DocumentSnapshot` that signals whether or not the data
    * exists. True if the document exists.
@@ -767,7 +777,7 @@ type DocumentSnapshot<doc extends DocumentData> = {
   /**
    * Property of the `DocumentSnapshot` that provides the document's ID.
    */
-  readonly id: string;
+  readonly id: key;
 
   /**
    *  Metadata about the `DocumentSnapshot`, including information about its
@@ -821,7 +831,7 @@ type DocumentSnapshot<doc extends DocumentData> = {
    * @param other The `DocumentSnapshot` to compare against.
    * @return true if this `DocumentSnapshot` is equal to the provided one.
    */
-  readonly isEqual: (other: DocumentSnapshot<doc>) => boolean;
+  readonly isEqual: (other: DocumentSnapshot<key, doc>) => boolean;
 };
 
 /**
@@ -835,8 +845,8 @@ type DocumentSnapshot<doc extends DocumentData> = {
  * `exists` property will always be true and `data()` will never return
  * 'undefined'.
  */
-interface QueryDocumentSnapshot<doc extends DocumentData>
-  extends DocumentSnapshot<doc> {
+interface QueryDocumentSnapshot<key extends string, doc extends DocumentData>
+  extends DocumentSnapshot<key, doc> {
   /**
    * Retrieves all fields in the document as an Object.
    *
@@ -857,7 +867,7 @@ interface QueryDocumentSnapshot<doc extends DocumentData>
  * A `Query` refers to a Query which you can read or listen to. You can also
  * construct refined `Query` objects by adding filters and ordering.
  */
-type Query<doc extends DocumentData> = {
+type Query<key extends string, value extends DocumentData> = {
   /**
    * The `Firestore` for the Firestore database (useful for performing
    * transactions, etc.).
@@ -874,35 +884,35 @@ type Query<doc extends DocumentData> = {
    * @param value The value for comparison
    * @return The created Query.
    */
-  where<path extends keyof doc & string>(
+  where<path extends keyof value & string>(
     fieldPath: path,
     opStr: "<" | "<=" | "==" | ">=" | ">",
-    value: doc[path]
-  ): Query<doc>;
+    value: value[path]
+  ): Query<key, value>;
 
-  where<path extends keyof doc & string>(
+  where<path extends keyof value & string>(
     fieldPath: path,
     opStr: "array-contains",
-    value: doc[path] extends Array<infer V> ? V : never
-  ): Query<doc>;
+    value: value[path] extends Array<infer V> ? V : never
+  ): Query<key, value>;
 
-  where<path extends keyof doc & string>(
+  where<path extends keyof value & string>(
     fieldPath: path,
     opStr: "in",
-    value: Array<doc[path]>
-  ): Query<doc>;
+    value: Array<value[path]>
+  ): Query<key, value>;
 
-  where<path extends keyof doc & string>(
+  where<path extends keyof value & string>(
     fieldPath: path,
     opStr: "array-contains-any",
-    value: doc[path] extends Array<infer V> ? Array<V> : never
-  ): Query<doc>;
+    value: value[path] extends Array<infer V> ? Array<V> : never
+  ): Query<key, value>;
 
   where(
     fieldPath: firestore.FieldPath,
     opStr: firestore.WhereFilterOp,
-    value: ObjectValueType<doc>
-  ): Query<doc>;
+    value: ObjectValueType<value>
+  ): Query<key, value>;
 
   /**
    * Creates and returns a new Query that's additionally sorted by the
@@ -913,15 +923,15 @@ type Query<doc extends DocumentData> = {
    * not specified, order will be ascending.
    * @return The created Query.
    */
-  orderBy<path extends keyof doc & string>(
+  orderBy<path extends keyof value & string>(
     fieldPath: path,
     directionStr?: firestore.OrderByDirection
-  ): Query<doc>;
+  ): Query<key, value>;
 
   orderBy(
     fieldPath: firestore.FieldPath,
     directionStr?: firestore.OrderByDirection
-  ): Query<doc>;
+  ): Query<key, value>;
 
   /**
    * Creates and returns a new Query that only returns the first matching
@@ -930,7 +940,7 @@ type Query<doc extends DocumentData> = {
    * @param limit The maximum number of items to return.
    * @return The created Query.
    */
-  readonly limit: (limit: number) => Query<doc>;
+  readonly limit: (limit: number) => Query<key, value>;
 
   /**
    * Creates and returns a new Query that only returns the last matching
@@ -942,7 +952,7 @@ type Query<doc extends DocumentData> = {
    * @param limit The maximum number of items to return.
    * @return The created Query.
    */
-  readonly limitToLast: (limit: number) => Query<doc>;
+  readonly limitToLast: (limit: number) => Query<key, value>;
 
   /**
    * Creates and returns a new Query that starts at the provided document
@@ -953,7 +963,7 @@ type Query<doc extends DocumentData> = {
    * @param snapshot The snapshot of the document to start at.
    * @return The created Query.
    */
-  startAt(snapshot: DocumentSnapshot<doc>): Query<doc>;
+  startAt(snapshot: DocumentSnapshot<key, value>): Query<key, value>;
 
   /**
    * Creates and returns a new Query that starts at the provided fields
@@ -964,7 +974,7 @@ type Query<doc extends DocumentData> = {
    * of the query's order by.
    * @return The created Query.
    */
-  startAt(...fieldValues: any[]): Query<doc>;
+  startAt(...fieldValues: any[]): Query<key, value>;
 
   /**
    * Creates and returns a new Query that starts after the provided document
@@ -975,7 +985,7 @@ type Query<doc extends DocumentData> = {
    * @param snapshot The snapshot of the document to start after.
    * @return The created Query.
    */
-  startAfter(snapshot: DocumentSnapshot<doc>): Query<doc>;
+  startAfter(snapshot: DocumentSnapshot<key, value>): Query<key, value>;
 
   /**
    * Creates and returns a new Query that starts after the provided fields
@@ -986,7 +996,7 @@ type Query<doc extends DocumentData> = {
    * of the query's order by.
    * @return The created Query.
    */
-  startAfter(...fieldValues: any[]): Query<doc>;
+  startAfter(...fieldValues: any[]): Query<key, value>;
 
   /**
    * Creates and returns a new Query that ends before the provided document
@@ -997,7 +1007,7 @@ type Query<doc extends DocumentData> = {
    * @param snapshot The snapshot of the document to end before.
    * @return The created Query.
    */
-  endBefore(snapshot: DocumentSnapshot<doc>): Query<doc>;
+  endBefore(snapshot: DocumentSnapshot<key, value>): Query<key, value>;
 
   /**
    * Creates and returns a new Query that ends before the provided fields
@@ -1008,7 +1018,7 @@ type Query<doc extends DocumentData> = {
    * of the query's order by.
    * @return The created Query.
    */
-  endBefore(...fieldValues: any[]): Query<doc>;
+  endBefore(...fieldValues: any[]): Query<key, value>;
 
   /**
    * Creates and returns a new Query that ends at the provided document
@@ -1019,7 +1029,7 @@ type Query<doc extends DocumentData> = {
    * @param snapshot The snapshot of the document to end at.
    * @return The created Query.
    */
-  endAt(snapshot: DocumentSnapshot<doc>): Query<doc>;
+  endAt(snapshot: DocumentSnapshot<key, value>): Query<key, value>;
 
   /**
    * Creates and returns a new Query that ends at the provided fields
@@ -1030,7 +1040,7 @@ type Query<doc extends DocumentData> = {
    * of the query's order by.
    * @return The created Query.
    */
-  endAt(...fieldValues: any[]): Query<doc>;
+  endAt(...fieldValues: any[]): Query<key, value>;
 
   /**
    * Returns true if this `Query` is equal to the provided one.
@@ -1038,7 +1048,7 @@ type Query<doc extends DocumentData> = {
    * @param other The `Query` to compare against.
    * @return true if this `Query` is equal to the provided one.
    */
-  readonly isEqual: (other: Query<doc>) => boolean;
+  readonly isEqual: (other: Query<key, value>) => boolean;
 
   /**
    * Executes the query and returns the results as a `QuerySnapshot`.
@@ -1051,7 +1061,9 @@ type Query<doc extends DocumentData> = {
    * @param options An object to configure the get behavior.
    * @return A Promise that will be resolved with the results of the Query.
    */
-  readonly get: (options?: firestore.GetOptions) => Promise<QuerySnapshot<doc>>;
+  readonly get: (
+    options?: firestore.GetOptions
+  ) => Promise<QuerySnapshot<key, value>>;
 
   /**
    * Attaches a listener for QuerySnapshot events. You may either pass
@@ -1067,7 +1079,7 @@ type Query<doc extends DocumentData> = {
    * the snapshot listener.
    */
   onSnapshot(observer: {
-    next?: (snapshot: QuerySnapshot<doc>) => void;
+    next?: (snapshot: QuerySnapshot<key, value>) => void;
     error?: (error: Error) => void;
     complete?: () => void;
   }): () => void;
@@ -1089,7 +1101,7 @@ type Query<doc extends DocumentData> = {
   onSnapshot(
     options: firestore.SnapshotListenOptions,
     observer: {
-      next?: (snapshot: QuerySnapshot<doc>) => void;
+      next?: (snapshot: QuerySnapshot<key, value>) => void;
       error?: (error: Error) => void;
       complete?: () => void;
     }
@@ -1112,7 +1124,7 @@ type Query<doc extends DocumentData> = {
    * the snapshot listener.
    */
   onSnapshot(
-    onNext: (snapshot: QuerySnapshot<doc>) => void,
+    onNext: (snapshot: QuerySnapshot<key, value>) => void,
     onError?: (error: Error) => void,
     onCompletion?: () => void
   ): () => void;
@@ -1136,7 +1148,7 @@ type Query<doc extends DocumentData> = {
    */
   onSnapshot(
     options: firestore.SnapshotListenOptions,
-    onNext: (snapshot: QuerySnapshot<doc>) => void,
+    onNext: (snapshot: QuerySnapshot<key, value>) => void,
     onError?: (error: Error) => void,
     onCompletion?: () => void
   ): () => void;
@@ -1149,12 +1161,12 @@ type Query<doc extends DocumentData> = {
  * number of documents can be determined via the `empty` and `size`
  * properties.
  */
-type QuerySnapshot<doc extends DocumentData> = {
+type QuerySnapshot<key extends string, value extends DocumentData> = {
   /**
    * The query on which you called `get` or `onSnapshot` in order to get this
    * `QuerySnapshot`.
    */
-  readonly query: Query<doc>;
+  readonly query: Query<key, value>;
 
   /**
    * Metadata about this snapshot, concerning its source and if it has local
@@ -1163,7 +1175,7 @@ type QuerySnapshot<doc extends DocumentData> = {
   readonly metadata: firestore.SnapshotMetadata;
 
   /** An array of all the documents in the `QuerySnapshot`. */
-  readonly docs: Array<QueryDocumentSnapshot<doc>>;
+  readonly docs: Array<QueryDocumentSnapshot<key, value>>;
 
   /** The number of documents in the `QuerySnapshot`. */
   readonly size: number;
@@ -1181,7 +1193,7 @@ type QuerySnapshot<doc extends DocumentData> = {
    */
   readonly docChanges: (
     options?: firestore.SnapshotListenOptions
-  ) => ReadonlyArray<DocumentChange<doc>>;
+  ) => ReadonlyArray<DocumentChange<key, value>>;
 
   /**
    * Enumerates all of the documents in the `QuerySnapshot`.
@@ -1191,7 +1203,7 @@ type QuerySnapshot<doc extends DocumentData> = {
    * @param thisArg The `this` binding for the callback.
    */
   readonly forEach: (
-    callback: (result: QueryDocumentSnapshot<doc>) => void,
+    callback: (result: QueryDocumentSnapshot<key, value>) => void,
     thisArg?: any
   ) => void;
 
@@ -1201,19 +1213,19 @@ type QuerySnapshot<doc extends DocumentData> = {
    * @param other The `QuerySnapshot` to compare against.
    * @return true if this `QuerySnapshot` is equal to the provided one.
    */
-  readonly isEqual: (other: QuerySnapshot<doc>) => boolean;
+  readonly isEqual: (other: QuerySnapshot<key, value>) => boolean;
 };
 
 /**
  * A `DocumentChange` represents a change to the documents matching a query.
  * It contains the document affected and the type of change that occurred.
  */
-type DocumentChange<doc extends DocumentData> = {
+type DocumentChange<key extends string, value extends DocumentData> = {
   /** The type of change ('added', 'modified', or 'removed'). */
   readonly type: firestore.DocumentChangeType;
 
   /** The document affected by this change. */
-  readonly doc: QueryDocumentSnapshot<doc>;
+  readonly doc: QueryDocumentSnapshot<key, value>;
 
   /**
    * The index of the changed document in the result set immediately prior to
@@ -1238,7 +1250,7 @@ type DocumentChange<doc extends DocumentData> = {
  */
 type CollectionReference<
   docAndSub extends DocumentAndSubCollectionData
-> = Query<docAndSub["value"]> & {
+> = Query<docAndSub["key"], docAndSub["value"]> & {
   /** The collection's identifier. */
   readonly id: string;
 
