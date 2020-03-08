@@ -1,6 +1,6 @@
 {
   "name": "typed-firestore",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "stronger type for @firebase/firestore-types",
   "types": "index.d.ts",
   "author": "narumincho <narumincho.starfy@gmail.com> (https://narumincho.com)",
