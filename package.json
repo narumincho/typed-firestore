@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@firebase/app-types": "^0.5.2",
-    "@firebase/firestore-types": "^1.9.2"
+    "@firebase/firestore-types": "^1.10.0"
   },
   "devDependencies": {
     "typescript": "^3.8.2"
