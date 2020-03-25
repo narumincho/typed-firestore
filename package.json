@@ -10,10 +10,10 @@
     "url": "https://github.com/narumincho/typed-firestore.git"
   },
   "dependencies": {
-    "@firebase/app-types": "^0.5.2",
-    "@firebase/firestore-types": "^1.10.0"
+    "@firebase/app-types": "^0.6.0",
+    "@firebase/firestore-types": "^1.10.1"
   },
   "devDependencies": {
-    "typescript": "^3.8.2"
+    "typescript": "^3.8.3"
   }
 }
