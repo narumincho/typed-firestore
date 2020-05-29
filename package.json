@@ -1,6 +1,6 @@
 {
   "name": "typed-firestore",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "stronger type for @firebase/firestore-types",
   "types": "index.d.ts",
   "author": "narumincho <narumincho.starfy@gmail.com> (https://narumincho.com)",
@@ -9,7 +9,7 @@
     "type": "git",
     "url": "https://github.com/narumincho/typed-firestore.git"
   },
-  "dependencies": {
+  "peerDependencies": {
     "@firebase/app-types": "^0.6.1",
     "@firebase/firestore-types": "^1.10.2"
   },
