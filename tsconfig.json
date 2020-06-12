@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    "target": "es2019",
-    "module": "commonjs",
-    "newLine": "LF",
+    "target": "ES2019",
+    "module": "CommonJS",
+    "newLine": "lf",
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "outDir": "distribution",

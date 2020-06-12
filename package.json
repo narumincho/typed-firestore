@@ -11,9 +11,9 @@
   },
   "peerDependencies": {
     "@firebase/app-types": "^0.6.1",
-    "@firebase/firestore-types": "^1.10.2"
+    "@firebase/firestore-types": "^1.11.0"
   },
   "devDependencies": {
-    "typescript": "^3.9.3"
+    "typescript": "^3.9.5"
   }
 }
