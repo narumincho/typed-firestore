@@ -1,4 +1,4 @@
-import * as f from "./index";
+import type * as f from "./index";
 import * as firestore from "@firebase/firestore-types";
 
 const firestoreInstance = (({} as firestore.FirebaseFirestore) as unknown) as f.Firestore<{

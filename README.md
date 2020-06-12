@@ -12,7 +12,7 @@ type support for firebase firestore.
 ```ts
 import * as firebase from "firebase/app";
 import "firebase/firestore";
-import * as typedFirestore from "typed-firestore";
+import type * as typedFirestore from "typed-firestore";
 
 firebase.initializeApp({...});
 
