@@ -652,9 +652,9 @@ type DocumentReference<docAndSub extends DocumentAndSubCollectionData> = {
    * @return A Promise resolved with a DocumentSnapshot containing the
    * current document contents.
    */
-  readonly get: (
+  readonly get: <T extends docAndSub["key"]>(
     options?: firestore.GetOptions
-  ) => Promise<DocumentSnapshot<docAndSub["key"], docAndSub["value"]>>;
+  ) => Promise<DocumentSnapshot<T, Extract<docAndSub, { key: T }>["value"]>>;
 
   /**
    * Attaches a listener for DocumentSnapshot events. You may either pass
@@ -1274,9 +1274,9 @@ type CollectionReference<
    * @param documentPath A slash-separated path to a document.
    * @return The `DocumentReference` instance.
    */
-  readonly doc: (
-    documentPath?: docAndSub["key"]
-  ) => DocumentReference<docAndSub>;
+  readonly doc: <T extends docAndSub["key"]>(
+    documentPath?: T
+  ) => DocumentReference<Extract<docAndSub, { key: T }>>;
 
   /**
    * Add a new document to this collection with the specified data, assigning

@@ -4,6 +4,23 @@ import * as firestore from "@firebase/firestore-types";
 const firestoreInstance = (({} as firestore.FirebaseFirestore) as unknown) as f.Firestore<{
   user: { key: UserId; value: User; subCollections: {} };
   music: { key: MusicId; value: Music; subCollections: {} };
+  withSubcollection: {
+    key: string;
+    value: never;
+    subCollections: {
+      data:
+        | {
+            key: "SubcollectionDoc1";
+            value: SubcollectionDoc1;
+            subCollections: {};
+          }
+        | {
+            key: "SubcollectionDoc2";
+            value: SubcollectionDoc2;
+            subCollections: {};
+          };
+    };
+  };
 }>;
 
 type UserId = string & { _userId: never };
@@ -26,6 +43,14 @@ type Music = {
   artist: UserId;
 };
 
+type SubcollectionDoc1 = {
+  field1: string;
+};
+
+type SubcollectionDoc2 = {
+  field2: string;
+};
+
 (async () => {
   const userQuerySnapshotArray = await firestoreInstance
     .collection("user")
@@ -42,4 +67,11 @@ type Music = {
       firestoreInstance.collection("user").doc(likedMusicId); // error !!!
     }
   }
+
+  const doc = await firestoreInstance
+    .collection("withSubcollection") // autocomplete
+    .doc("id" as string)
+    .collection("data") // autocomplete
+    .doc("SubcollectionDoc1") // autocomplete
+    .get(); // returns DocumentSnapshot of SubcollectionDoc1
 })();
