@@ -19,6 +19,23 @@ firebase.initializeApp({...});
 const firestoreInstance = (firebase.firestore() as unknown) as f.Firestore<{
   user: { key: UserId; value: User; subCollections: {} };
   music: { key: MusicId; value: Music; subCollections: {} };
+  project: {
+    key: ProjectId;
+    value: Project;
+    subCollections: {
+      data:
+        | {
+            key: "Body";
+            value: { text: string };
+            subCollections: {};
+          }
+        | {
+            key: "Comments";
+            value: Comments;
+            subCollections: {};
+          };
+    };
+  };
 }>;
 
 type UserId = string & { _userId: never };
@@ -41,6 +58,21 @@ type Music = {
   artist: UserId;
 };
 
+type ProjectId = string & { _projectId: never };
+
+type Project = {
+  name: string;
+  createdBy: UserId;
+};
+
+type Comments = {
+  comments: ReadonlyArray<{
+    body: string;
+    createdBy: UserId;
+    createdAt: firestore.Timestamp;
+  }>;
+};
+
 (async () => {
   const userQuerySnapshotArray = await firestoreInstance
     .collection("user")
@@ -57,5 +89,12 @@ type Music = {
       firestoreInstance.collection("user").doc(likedMusicId); // error !!!
     }
   }
+
+  const commentDoc = await firestoreInstance
+    .collection("project") // autocomplete
+    .doc("6b9495528e9a12186b9c210448bdc90b" as ProjectId)
+    .collection("data") // autocomplete
+    .doc("Comments") // autocomplete
+    .get(); // returns DocumentSnapshot of Comments
 })();
 ```

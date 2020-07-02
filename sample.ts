@@ -4,19 +4,19 @@ import * as firestore from "@firebase/firestore-types";
 const firestoreInstance = (({} as firestore.FirebaseFirestore) as unknown) as f.Firestore<{
   user: { key: UserId; value: User; subCollections: {} };
   music: { key: MusicId; value: Music; subCollections: {} };
-  withSubcollection: {
-    key: string;
-    value: never;
+  project: {
+    key: ProjectId;
+    value: Project;
     subCollections: {
       data:
         | {
-            key: "SubcollectionDoc1";
-            value: SubcollectionDoc1;
+            key: "Body";
+            value: { text: string };
             subCollections: {};
           }
         | {
-            key: "SubcollectionDoc2";
-            value: SubcollectionDoc2;
+            key: "Comments";
+            value: Comments;
             subCollections: {};
           };
     };
@@ -43,12 +43,19 @@ type Music = {
   artist: UserId;
 };
 
-type SubcollectionDoc1 = {
-  field1: string;
+type ProjectId = string & { _projectId: never };
+
+type Project = {
+  name: string;
+  createdBy: UserId;
 };
 
-type SubcollectionDoc2 = {
-  field2: string;
+type Comments = {
+  comments: ReadonlyArray<{
+    body: string;
+    createdBy: UserId;
+    createdAt: firestore.Timestamp;
+  }>;
 };
 
 (async () => {
@@ -68,10 +75,10 @@ type SubcollectionDoc2 = {
     }
   }
 
-  const doc = await firestoreInstance
-    .collection("withSubcollection") // autocomplete
-    .doc("id" as string)
+  const commentDoc = await firestoreInstance
+    .collection("project") // autocomplete
+    .doc("6b9495528e9a12186b9c210448bdc90b" as ProjectId)
     .collection("data") // autocomplete
-    .doc("SubcollectionDoc1") // autocomplete
-    .get(); // returns DocumentSnapshot of SubcollectionDoc1
+    .doc("Comments") // autocomplete
+    .get(); // returns DocumentSnapshot of Comments
 })();
