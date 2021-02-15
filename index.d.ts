@@ -880,13 +880,13 @@ type Query<key extends string, value extends DocumentData> = {
    * relation constraint provided.
    *
    * @param fieldPath The path to compare
-   * @param opStr The operation string (e.g "<", "<=", "==", ">", ">=").
+   * @param opStr The operation string (e.g "<", "<=", "==", "!=", ">", ">=").
    * @param value The value for comparison
    * @return The created Query.
    */
   where<path extends keyof value & string>(
     fieldPath: path,
-    opStr: "<" | "<=" | "==" | ">=" | ">",
+    opStr: "<" | "<=" | "==" | "!=" | ">=" | ">",
     value: value[path]
   ): Query<key, value>;
 
@@ -899,6 +899,12 @@ type Query<key extends string, value extends DocumentData> = {
   where<path extends keyof value & string>(
     fieldPath: path,
     opStr: "in",
+    value: Array<value[path]>
+  ): Query<key, value>;
+
+  where<path extends keyof value & string>(
+    fieldPath: path,
+    opStr: "not-in",
     value: Array<value[path]>
   ): Query<key, value>;
 
